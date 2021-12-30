@@ -2,6 +2,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
+spl-net/.idea/*
 spl-net/.idea/**/workspace.xml
 spl-net/.idea/**/tasks.xml
 spl-net/.idea/**/usage.statistics.xml
@@ -72,6 +73,7 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+spl-net/spl-net.iml
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
