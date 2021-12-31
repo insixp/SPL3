@@ -6,10 +6,10 @@ import bgu.spl.net.srv.Server;
 
 import java.io.IOException;
 
-public class TPCServer {
+public class ReactorMain {
 
     public static void main(String[] args) {
-        try (Server<String> server = Server.threadPerClient(7777, EchoProtocol::new, LineMessageEncoderDecoder::new)){
+        try (Server<String> server = Server.reactor(50, 7777, EchoProtocol::new, LineMessageEncoderDecoder::new)){
             server.serve();
         } catch (IOException e) {
             e.printStackTrace();

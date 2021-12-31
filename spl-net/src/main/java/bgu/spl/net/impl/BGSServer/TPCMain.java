@@ -6,7 +6,7 @@ import bgu.spl.net.srv.Server;
 
 import java.io.IOException;
 
-public class TPCServer {
+public class TPCMain {
 
     public static void main(String[] args) {
         try (Server<String> server = Server.threadPerClient(7777, EchoProtocol::new, LineMessageEncoderDecoder::new)){
