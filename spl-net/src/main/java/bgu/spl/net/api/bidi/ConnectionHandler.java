@@ -5,6 +5,8 @@ import java.io.IOException;
 
 public interface ConnectionHandler<T> extends Closeable{
 
-    void send(T msg) ;
+    void send(T msg);
+
+    boolean trySend(T msg);
 
 }
