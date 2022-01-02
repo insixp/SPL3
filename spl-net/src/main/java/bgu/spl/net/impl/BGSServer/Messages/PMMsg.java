@@ -2,6 +2,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
+import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
 
@@ -15,7 +16,24 @@ public class PMMsg extends Message{
         super(MessageCode.PM.OPCODE);
     }
 
-    public void process(){}
+    public void process(){
+        User sendUser=db.search(this.connId);
+        User reciveUser=db. get(username);
+        int reciveID=reciveUser.getConnectionID();
+        if(reciveUser!=null && sendUser.getLogged_in() && sendUser.getFollowList().contains(username)){
+            NotificationMsg noti=new NotificationMsg();
+            noti.setContent(content);
+            AckMsg ackmsg=new AckMsg();
+            ackmsg.setMsgOpCode(this.opcode);
+            this.connections.send(this.connId,ackmsg);
+            this.connections.send(reciveID,noti);
+            this.db.saveMesssege(noti);
+        }
+        else{
+            this.sendError();
+        }
+
+    }
 
     @Override
     public byte[] serialize() {

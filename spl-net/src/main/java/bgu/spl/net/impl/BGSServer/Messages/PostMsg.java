@@ -12,6 +12,13 @@ public class PostMsg extends Message{
         super(MessageCode.POST.OPCODE);
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+    public String getContent(){
+        return this.content;
+    }
+
     public void process(){}
 
     @Override

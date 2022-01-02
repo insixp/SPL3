@@ -1,11 +1,19 @@
 package bgu.spl.net.impl.BGSServer;
 
+import java.util.LinkedList;
+
 public class User {
     private String   username;
     private String   password;
     private String   birthday;
     private int      connectionID;
     private boolean  logged_in;
+    private LinkedList<String> FollowList;
+
+    public User(){
+        this.FollowList=new LinkedList<>();
+    }
+    public LinkedList<String> getFollowList(){return this.FollowList;}
 
     public String getUsername() {
         return username;

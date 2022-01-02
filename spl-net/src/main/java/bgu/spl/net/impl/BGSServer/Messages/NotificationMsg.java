@@ -9,8 +9,8 @@ import java.nio.charset.StandardCharsets;
 public class NotificationMsg extends Message{
 
     public byte     action;
-    public String   username;
-    public String   content;
+    private String   username;
+    private String   content;
 
     public NotificationMsg(){
         super(MessageCode.NOTIFICATION.OPCODE);
@@ -25,6 +25,12 @@ public class NotificationMsg extends Message{
         return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username + '\0' + this.content + '\0');
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+    public String getContent() {
+        return this.content;
+    }
     @Override
     public void decodeNextByte(byte data) {
         if(this.content_index == 0) {

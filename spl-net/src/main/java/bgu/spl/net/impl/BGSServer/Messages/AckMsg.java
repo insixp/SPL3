@@ -8,12 +8,22 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 public class AckMsg extends Message{
-    public short    msgOpCode;
-
+    private short    msgOpCode;
+    private String FollowedUsername="";
     public AckMsg(){
         super(MessageCode.ACK.OPCODE);
     }
 
+    public short getMsgOpCode() {
+        return msgOpCode;
+    }
+
+    public void setMsgOpCode(short msgOpCode) {
+        this.msgOpCode = msgOpCode;
+    }
+    public void setFollowedUsername(String username){
+        this.FollowedUsername=username;
+    }
     @Override
     public void process() throws IOException{
         throw new IOException("Recieved Ack msg inside the server");
@@ -21,7 +31,7 @@ public class AckMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + shortToString(this.msgOpCode));
+        return this.StringtoByte(shortToString(opcode) + shortToString(this.msgOpCode) + FollowedUsername);
     }
 
     @Override
