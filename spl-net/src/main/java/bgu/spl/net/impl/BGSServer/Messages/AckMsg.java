@@ -21,7 +21,7 @@ public class AckMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return new byte[0];
+        return this.StringtoByte(shortToString(opcode) + shortToString(this.msgOpCode));
     }
 
     @Override

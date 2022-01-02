@@ -6,11 +6,8 @@ import bgu.spl.net.impl.BGSServer.User;
 
 public class RegisterMsg extends Message{
     public String  username;
-    public byte    pad;
     public String  password;
-    public byte    pad2;
     public String  birthday;
-    public byte    pad3;
 
     public RegisterMsg(){
         super(MessageCode.REGISTER.OPCODE);
@@ -29,34 +26,25 @@ public class RegisterMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.username + byteToString(this.pad) + this.password + byteToString(this.pad2) + this.birthday + byteToString(this.pad3));
+        return this.StringtoByte(shortToString(opcode) + this.username + '\0' + this.password + '\0' + this.birthday + '\0');
     }
 
     @Override
     public void decodeNextByte(byte data) {
         if(this.content_index == 0) {
             this.username = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 1){
-            this.pad = data;
-        }
-        if(this.content_index == 2) {
+        else if(this.content_index == 1) {
             this.password = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 3){
-            this.pad2 = data;
-        }
-        if(this.content_index == 4) {
+        else if(this.content_index == 2) {
             this.birthday = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
-        }
-        else if(this.content_index == 5){
-            this.pad3 = data;
         }
         else {
             this.data.add(data);

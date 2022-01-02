@@ -25,7 +25,7 @@ public class LogoutMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return null;
+        return this.StringtoByte(shortToString(opcode));
     }
 
     @Override

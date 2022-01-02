@@ -3,16 +3,14 @@ package bgu.spl.net.impl.BGSServer.Messages;
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-public abstract class Message implements Serializable {
-    public short  opcode;
-    public LinkedList<Byte>  data;
+public abstract class Message {
+    protected short  opcode;
+    protected LinkedList<Byte> data;
     protected int content_index;
     protected byte[] buff = new byte[1 << 10];
     private int len;
@@ -63,7 +61,7 @@ public abstract class Message implements Serializable {
     public abstract void   decodeNextByte(byte data);
 
     protected String bytesToString(byte data){
-        if (data == '\n') {
+        if (data == '\0') {
             String result = new String(buff, 0, len, StandardCharsets.UTF_8);
             len = 0;
             return result;

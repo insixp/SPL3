@@ -28,7 +28,7 @@ public class FollowUnfollowMsg extends Message{
         }
         else if(this.content_index == 1){
             this.username = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
         }
         else {

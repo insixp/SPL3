@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class StatsMsg extends Message{
     public String  usernames;
-    public byte    pad;
 
     public StatsMsg(){
         super(MessageCode.STATS.OPCODE);
@@ -17,18 +16,15 @@ public class StatsMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.usernames + byteToString(this.pad));
+        return this.StringtoByte(shortToString(opcode) + this.usernames + '\0');
     }
 
     @Override
     public void decodeNextByte(byte data) {
         if(this.content_index == 0) {
             this.usernames = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
-        }
-        else if(this.content_index == 1){
-            this.pad = data;
         }
         else {
             this.data.add(data);

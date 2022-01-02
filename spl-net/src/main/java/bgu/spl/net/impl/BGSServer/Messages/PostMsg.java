@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class PostMsg extends Message{
     public String  content;
-    public byte    pad;
 
     public PostMsg(){
         super(MessageCode.POST.OPCODE);
@@ -17,18 +16,15 @@ public class PostMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.content + byteToString(this.pad));
+        return this.StringtoByte(shortToString(opcode) + this.content + '\0');
     }
 
     @Override
     public void decodeNextByte(byte data) {
         if(this.content_index == 0) {
             this.content = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
-        }
-        else if(this.content_index == 1){
-            this.pad = data;
         }
         else {
             this.data.add(data);

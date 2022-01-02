@@ -28,11 +28,27 @@ public class BGSClient {
              BufferedOutputStream out = new BufferedOutputStream(sock.getOutputStream())) {
 
             System.out.println("sending message to server");
-            out.write(encdec.encode(new ErrorMsg()));
+            RegisterMsg msg = new RegisterMsg();
+            msg.username = "david";
+            msg.password = "abc";
+            msg.birthday = "01-08-1992";
+            out.write(encdec.encode(msg));
             out.flush();
 
             System.out.println("awaiting response");
             int read;
+            while((read = in.read()) >= 0){
+                Message m = encdec.decodeNextByte((byte)read);
+                if(m != null)
+                    System.out.println(m);
+            }
+
+            msg = new RegisterMsg();
+            msg.username = "david";
+            msg.password = "abc";
+            msg.birthday = "01-08-1992";
+            out.write(encdec.encode(msg));
+
             while((read = in.read()) >= 0){
                 Message m = encdec.decodeNextByte((byte)read);
                 if(m != null)

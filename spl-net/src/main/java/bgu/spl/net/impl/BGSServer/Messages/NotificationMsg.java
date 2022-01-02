@@ -10,14 +10,10 @@ public class NotificationMsg extends Message{
 
     public byte     action;
     public String   username;
-    public byte     pad1;
     public String   content;
-    public byte     pad2;
 
     public NotificationMsg(){
         super(MessageCode.NOTIFICATION.OPCODE);
-        this.pad1 = '\0';
-        this.pad2 = '\0';
     }
 
     public void process() throws IOException{
@@ -26,7 +22,7 @@ public class NotificationMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username + byteToString(this.pad1) + this.content + byteToString(this.pad2));
+        return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username + '\0' + this.content + '\0');
     }
 
     @Override
@@ -36,19 +32,13 @@ public class NotificationMsg extends Message{
         }
         if(this.content_index == 1) {
             this.username = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 2){
-            this.pad1 = data;
-        }
-        if(this.content_index == 3) {
+        else if(this.content_index == 2) {
             this.content = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
-        }
-        else if(this.content_index == 4){
-            this.pad2 = data;
         }
         else {
             this.data.add(data);

@@ -8,9 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class LoginMsg extends Message{
     public String  username;
-    public byte    pad;
     public String  password;
-    public byte    pad2;
     public byte    captcha;
 
     public LoginMsg(){
@@ -36,28 +34,22 @@ public class LoginMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.username + byteToString(this.pad) + this.password + byteToString(this.pad2) + this.captcha);
+        return this.StringtoByte(shortToString(opcode) + this.username + '\0' + this.password + '\0' + this.captcha);
     }
 
     @Override
     public void decodeNextByte(byte data) {
         if(this.content_index == 0) {
             this.username = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 1){
-            this.pad = data;
-        }
-        if(this.content_index == 2) {
+        else if(this.content_index == 1) {
             this.password = this.bytesToString(data);
-            if(data == '\n')
+            if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 3){
-            this.pad2 = data;
-        }
-        if(this.content_index == 2) {
+        else if(this.content_index == 2) {
             this.captcha = data;
         }
         else {
