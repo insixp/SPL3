@@ -13,18 +13,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
     ConcurrentHashMap<Integer, ConnectionHandler<T>>    connectionIdHM;
     private int connectionIdIndex;
 
-
-    private static class singletonHolder{
-        private static ConnectionsImpl instance = new ConnectionsImpl();
-    }
-
     public ConnectionsImpl(){
         this.connectionIdHM = new ConcurrentHashMap<Integer, ConnectionHandler<T>>();
         this.connectionIdIndex = 0;
-    }
-
-    public ConnectionsImpl getInstance(){
-        return singletonHolder.instance;
     }
 
     public int register(ConnectionHandler<T> connectionHandler){

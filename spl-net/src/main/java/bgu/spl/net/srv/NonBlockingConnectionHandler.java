@@ -3,6 +3,7 @@ package bgu.spl.net.srv;
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.bidi.ConnectionHandler;
 import bgu.spl.net.api.bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.bidi.Connections;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -123,5 +124,9 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     public boolean trySend(T msg) {
         this.send(msg);
         return true;
+    }
+
+    void start(int connectionId, Connections<T> connections){
+        this.protocol.start(connectionId, connections);
     }
 }

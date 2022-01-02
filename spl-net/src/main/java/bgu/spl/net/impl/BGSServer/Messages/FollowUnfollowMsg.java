@@ -1,0 +1,41 @@
+package bgu.spl.net.impl.BGSServer.Messages;
+
+import bgu.spl.net.impl.BGSServer.Database;
+
+import java.nio.charset.StandardCharsets;
+
+public class FollowUnfollowMsg extends Message{
+    public byte         action;
+    public String       username;
+
+    public FollowUnfollowMsg(){
+        super(MessageCode.FOLLOW.OPCODE);
+    }
+
+    public Message process(Database db){
+        return null;
+    }
+
+    @Override
+    public byte[] serialize() {
+        return this.StringtoByte(shortToString(opcode) + this.action + this.username);
+    }
+
+    @Override
+    public void decodeNextByte(byte data) {
+        if(this.content_index == 0) {
+            this.action = data;
+            this.content_index++;
+        }
+        else if(this.content_index == 1){
+            this.username = this.bytesToString(data);
+            if(data == '\n')
+                this.content_index++;
+        }
+        else {
+            this.data.add(data);
+        }
+    }
+
+
+}
