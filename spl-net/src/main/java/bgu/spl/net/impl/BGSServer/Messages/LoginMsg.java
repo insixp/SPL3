@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 import java.nio.charset.StandardCharsets;
@@ -16,13 +17,11 @@ public class LoginMsg extends Message{
     }
 
 
-    public Message process(Database db){
-        return null;
-    }
+    public void process(Database db, Connections<Message> connections, int connId){}
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.username + this.pad + this.password + this.pad2 + this.captcha);
+        return this.StringtoByte(shortToString(opcode) + this.username + byteToString(this.pad) + this.password + byteToString(this.pad2) + this.captcha);
     }
 
     @Override

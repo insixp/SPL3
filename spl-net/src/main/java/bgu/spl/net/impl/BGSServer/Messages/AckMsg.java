@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 import java.io.ByteArrayOutputStream;
@@ -14,9 +15,7 @@ public class AckMsg extends Message{
     }
 
     @Override
-    public Message process(Database db) {
-        return null;
-    }
+    public void process(Database db, Connections<Message> connections, int connId){}
 
     @Override
     public byte[] serialize() {

@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 import java.nio.charset.StandardCharsets;
@@ -12,13 +13,11 @@ public class FollowUnfollowMsg extends Message{
         super(MessageCode.FOLLOW.OPCODE);
     }
 
-    public Message process(Database db){
-        return null;
-    }
+    public void process(Database db, Connections<Message> connections, int connId){}
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.action + this.username);
+        return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username);
     }
 
     @Override

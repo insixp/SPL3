@@ -12,13 +12,17 @@ public class Database {
         public boolean logged_in;
     }
 
+    
+
     List<userDB> users;
 
     public Database(){
         this.users = new LinkedList<>();
     }
 
-    public void insert(String username, String password, String birthday){}
+    public void register(String username, String password, String birthday){
+
+    }
 
     public void delete(String username){}
 

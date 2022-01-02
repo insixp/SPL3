@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 import java.nio.charset.StandardCharsets;
@@ -12,13 +13,11 @@ public class PostMsg extends Message{
         super(MessageCode.POST.OPCODE);
     }
 
-    public Message process(Database db){
-        return null;
-    }
+    public void process(Database db, Connections<Message> connections, int connId){}
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.content + this.pad);
+        return this.StringtoByte(shortToString(opcode) + this.content + byteToString(this.pad));
     }
 
     @Override

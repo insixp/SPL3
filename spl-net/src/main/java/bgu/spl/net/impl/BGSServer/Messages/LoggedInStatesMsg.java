@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 public class LoggedInStatesMsg extends Message{
@@ -8,9 +9,7 @@ public class LoggedInStatesMsg extends Message{
         super(MessageCode.LOGGED_IN_STATS.OPCODE);
     }
 
-    public Message process(Database db){
-        return null;
-    }
+    public void process(Database db, Connections<Message> connections, int connId){}
 
     @Override
     public byte[] serialize() {

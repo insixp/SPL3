@@ -24,7 +24,7 @@ public class BGSClient {
 
         //BufferedReader and BufferedWriter automatically using UTF-8 encoding
         try (Socket sock = new Socket(args[0], 7777);
-             BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+             BufferedInputStream in = new BufferedInputStream(sock.getInputStream());
              BufferedOutputStream out = new BufferedOutputStream(sock.getOutputStream())) {
 
             System.out.println("sending message to server");
@@ -32,8 +32,12 @@ public class BGSClient {
             out.flush();
 
             System.out.println("awaiting response");
-            String line = in.readLine();
-            System.out.println("message from server: " + line);
+            int read;
+            while((read = in.read()) >= 0){
+                Message m = encdec.decodeNextByte((byte)read);
+                if(m != null)
+                    System.out.println(m);
+            }
         }
     }
 }

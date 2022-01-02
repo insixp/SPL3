@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 import java.nio.charset.StandardCharsets;
@@ -14,15 +15,15 @@ public class NotificationMsg extends Message{
 
     public NotificationMsg(){
         super(MessageCode.NOTIFICATION.OPCODE);
+        this.pad1 = '\0';
+        this.pad2 = '\0';
     }
 
-    public Message process(Database db){
-        return null;
-    }
+    public void process(Database db, Connections<Message> connections, int connId){}
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + this.action + this.username + this.pad1 + this.content + this.pad2);
+        return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username + byteToString(this.pad1) + this.content + byteToString(this.pad2));
     }
 
     @Override

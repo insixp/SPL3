@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 import java.io.Serializable;
@@ -40,7 +41,7 @@ public abstract class Message implements Serializable {
         this.data = new LinkedList<Byte>();
     }
 
-    public abstract Message process(Database db);
+    public abstract void process(Database db, Connections<Message> connections, int connId);
     public abstract byte[] serialize();
     public abstract void   decodeNextByte(byte data);
 
@@ -67,7 +68,7 @@ public abstract class Message implements Serializable {
         return bytesToShort(StringtoByte(data));
     }
     protected String byteToString(byte data){
-        return new String(new byte[]{data}, 0, 2, StandardCharsets.UTF_8);
+        return new String(new byte[]{data}, 0, 1, StandardCharsets.UTF_8);
     }
     protected byte stringToByte(String data){
         return StringtoByte(data)[0];

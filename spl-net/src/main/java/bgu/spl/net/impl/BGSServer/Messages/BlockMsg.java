@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer.Messages;
 
+import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
 public class BlockMsg extends Message{
@@ -10,8 +11,8 @@ public class BlockMsg extends Message{
         super(MessageCode.BLOCK.OPCODE);
     }
 
-    public Message process(Database db){
-        return null;
+    public void process(Database db, Connections<Message> connections, int connId){
+
     }
 
     @Override

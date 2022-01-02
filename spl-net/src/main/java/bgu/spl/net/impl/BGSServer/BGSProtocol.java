@@ -2,18 +2,20 @@ package bgu.spl.net.impl.BGSServer;
 
 import bgu.spl.net.api.bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.bidi.Connections;
+import bgu.spl.net.impl.BGSServer.Messages.ErrorMsg;
 import bgu.spl.net.impl.BGSServer.Messages.Message;
 import bgu.spl.net.impl.BGSServer.Messages.RegisterMsg;
-import bgu.spl.net.srv.ConnectionsImpl;
 
 public class BGSProtocol implements BidiMessagingProtocol<Message> {
 
-    Connections<Message>        connections;
-    private int                 connectionId;
+    private Connections<Message>    connections;
+    private Database                db;
+    private int                     connectionId;
 
     public BGSProtocol(){
         this.connections = null;
         this.connectionId = -1;
+        this.db = new Database();
     }
 
     @Override
@@ -24,9 +26,7 @@ public class BGSProtocol implements BidiMessagingProtocol<Message> {
 
     @Override
     public void process(Message message) {
-        if(message.opcode == Message.MessageCode.REGISTER.OPCODE){
-            RegisterMsg registerMsg = (RegisterMsg) message;
-        }
+        message.process(this.db, this.connections, this.connectionId);
     }
 
     @Override
