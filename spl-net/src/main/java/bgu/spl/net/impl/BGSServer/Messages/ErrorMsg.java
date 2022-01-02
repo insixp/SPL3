@@ -3,6 +3,8 @@ package bgu.spl.net.impl.BGSServer.Messages;
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
+import java.io.IOException;
+
 public class ErrorMsg extends Message{
     public short    msgOpCode;
 
@@ -12,12 +14,8 @@ public class ErrorMsg extends Message{
         super(MessageCode.ERROR.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){
-        NotificationMsg notiMsg = new NotificationMsg();
-        notiMsg.content = "hello, my name is obi";
-        notiMsg.username = "Davis";
-        notiMsg.action = 1;
-        connections.send(connId, notiMsg);
+    public void process(Database db, Connections<Message> connections, int connId) throws IOException{
+        throw new IOException("Recieved Error msg inside the server");
     }
 
     @Override

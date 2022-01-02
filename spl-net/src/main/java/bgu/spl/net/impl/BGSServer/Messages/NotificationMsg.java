@@ -3,6 +3,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class NotificationMsg extends Message{
@@ -19,7 +20,9 @@ public class NotificationMsg extends Message{
         this.pad2 = '\0';
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(Database db, Connections<Message> connections, int connId) throws IOException{
+        throw new IOException("Recieved Error msg inside the server");
+    }
 
     @Override
     public byte[] serialize() {

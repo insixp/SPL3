@@ -3,6 +3,8 @@ package bgu.spl.net.impl.BGSServer.Messages;
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
+import java.io.IOException;
+
 public class BlockMsg extends Message{
     public String  username;
     public byte    pad;
@@ -11,8 +13,8 @@ public class BlockMsg extends Message{
         super(MessageCode.BLOCK.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){
-
+    public void process(Database db, Connections<Message> connections, int connId) {
+        
     }
 
     @Override

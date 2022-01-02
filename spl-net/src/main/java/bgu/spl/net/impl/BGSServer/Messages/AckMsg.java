@@ -15,7 +15,9 @@ public class AckMsg extends Message{
     }
 
     @Override
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(Database db, Connections<Message> connections, int connId) throws IOException{
+        throw new IOException("Recieved Ack msg inside the server");
+    }
 
     @Override
     public byte[] serialize() {

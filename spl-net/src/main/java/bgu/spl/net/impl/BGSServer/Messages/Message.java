@@ -3,6 +3,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public abstract class Message implements Serializable {
         this.data = new LinkedList<Byte>();
     }
 
-    public abstract void process(Database db, Connections<Message> connections, int connId);
+    public abstract void process(Database db, Connections<Message> connections, int connId) throws IOException;
     public abstract byte[] serialize();
     public abstract void   decodeNextByte(byte data);
 

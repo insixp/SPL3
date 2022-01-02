@@ -6,6 +6,8 @@ import bgu.spl.net.impl.BGSServer.Messages.ErrorMsg;
 import bgu.spl.net.impl.BGSServer.Messages.Message;
 import bgu.spl.net.impl.BGSServer.Messages.RegisterMsg;
 
+import java.io.IOException;
+
 public class BGSProtocol implements BidiMessagingProtocol<Message> {
 
     private Connections<Message>    connections;
@@ -15,7 +17,7 @@ public class BGSProtocol implements BidiMessagingProtocol<Message> {
     public BGSProtocol(){
         this.connections = null;
         this.connectionId = -1;
-        this.db = new Database();
+        this.db = Database.getInstance();
     }
 
     @Override
@@ -26,7 +28,11 @@ public class BGSProtocol implements BidiMessagingProtocol<Message> {
 
     @Override
     public void process(Message message) {
-        message.process(this.db, this.connections, this.connectionId);
+        try {
+            message.process(this.db, this.connections, this.connectionId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
