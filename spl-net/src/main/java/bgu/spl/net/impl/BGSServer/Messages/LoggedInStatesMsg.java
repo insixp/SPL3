@@ -9,7 +9,7 @@ public class LoggedInStatesMsg extends Message{
         super(MessageCode.LOGGED_IN_STATS.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){}
 
     @Override
     public byte[] serialize() {

@@ -13,7 +13,7 @@ public class PostMsg extends Message{
         super(MessageCode.POST.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){}
 
     @Override
     public byte[] serialize() {

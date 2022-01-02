@@ -6,7 +6,7 @@ import bgu.spl.net.impl.BGSServer.Database;
 import java.io.IOException;
 
 public class ErrorMsg extends Message{
-    public short    msgOpCode;
+    private short    msgOpCode;
 
     private byte[] buff;
 
@@ -14,7 +14,11 @@ public class ErrorMsg extends Message{
         super(MessageCode.ERROR.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId) throws IOException{
+    public void setOpCode(short msgOpCode) { this.msgOpCode = msgOpCode; }
+
+    public short getMsgOpCode() { return msgOpCode; }
+
+    public void process() throws IOException{
         throw new IOException("Recieved Error msg inside the server");
     }
 

@@ -13,7 +13,7 @@ public class BlockMsg extends Message{
         super(MessageCode.BLOCK.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId) {
+    public void process() {
         
     }
 

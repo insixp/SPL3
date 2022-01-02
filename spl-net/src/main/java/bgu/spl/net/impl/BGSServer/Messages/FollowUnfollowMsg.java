@@ -13,7 +13,7 @@ public class FollowUnfollowMsg extends Message{
         super(MessageCode.FOLLOW.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){}
 
     @Override
     public byte[] serialize() {

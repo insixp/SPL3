@@ -3,6 +3,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +16,9 @@ public abstract class Message implements Serializable {
     protected int content_index;
     protected byte[] buff = new byte[1 << 10];
     private int len;
+    protected Connections<Message> connections;
+    protected Database db;
+    protected int connId;
 
     //  OPCODES
     public enum MessageCode {
@@ -42,7 +46,19 @@ public abstract class Message implements Serializable {
         this.data = new LinkedList<Byte>();
     }
 
-    public abstract void process(Database db, Connections<Message> connections, int connId) throws IOException;
+    public void setConnections(Connections<Message> connections) {
+        this.connections = connections;
+    }
+
+    public void setDb(Database db) {
+        this.db = db;
+    }
+
+    public void setConnId(int connId) {
+        this.connId = connId;
+    }
+
+    public abstract void process() throws IOException;
     public abstract byte[] serialize();
     public abstract void   decodeNextByte(byte data);
 
@@ -59,6 +75,13 @@ public abstract class Message implements Serializable {
         this.buff[len++] = data;
         return null;
     }
+
+    protected void sendError(){
+        ErrorMsg replyError = new ErrorMsg();
+        replyError.setOpCode(this.opcode);
+        connections.send(connId, replyError);
+    }
+
     protected byte[] StringtoByte(String data){
         return data.getBytes(StandardCharsets.UTF_8);
     }

@@ -20,7 +20,7 @@ public class NotificationMsg extends Message{
         this.pad2 = '\0';
     }
 
-    public void process(Database db, Connections<Message> connections, int connId) throws IOException{
+    public void process() throws IOException{
         throw new IOException("Recieved Error msg inside the server");
     }
 

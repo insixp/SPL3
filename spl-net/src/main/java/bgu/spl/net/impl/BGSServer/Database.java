@@ -1,21 +1,13 @@
 package bgu.spl.net.impl.BGSServer;
 
-import javax.xml.crypto.Data;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Database {
 
-    ConcurrentHashMap<String, userDB>  usernameToUserDBHS;
-
-    public class userDB{
-        public String   username;
-        public String   password;
-        public String   birthday;
-        public int      connectionID;
-        public boolean  logged_in;
-    }
+    ConcurrentHashMap<String, User>  usernameToUserDBHS;
 
     private static class singletonHolder{
         private static Database instance = new Database();
@@ -25,7 +17,7 @@ public class Database {
         return singletonHolder.instance;
     }
 
-    List<userDB> users;
+    List<User> users;
 
     private Database(){
         this.users = new LinkedList<>();
@@ -33,12 +25,12 @@ public class Database {
     }
 
     public void register(String username, String password, String birthday){
-        userDB user = new userDB();
-        user.username = username;
-        user.password = password;
-        user.birthday = birthday;
-        user.connectionID = -1;
-        user.logged_in = false;
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setBirthday(birthday);
+        user.setConnectionID(-1);
+        user.setLogged_in(false);
         this.usernameToUserDBHS.put(username, user);
     }
 
@@ -46,8 +38,16 @@ public class Database {
         this.usernameToUserDBHS.remove(username);
     }
 
-    public userDB get(String username){
+    public User get(String username){
         return this.usernameToUserDBHS.get(username);
     }
 
+    public User search(int connId){
+        List<User>  users = Collections.list(this.usernameToUserDBHS.elements());
+        for(User user : users){
+            if(user.getConnectionID() == connId)
+                return user;
+        }
+        return null;
+    }
 }

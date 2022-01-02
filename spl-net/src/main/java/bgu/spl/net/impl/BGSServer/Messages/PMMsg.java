@@ -18,7 +18,7 @@ public class PMMsg extends Message{
         super(MessageCode.PM.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){}
 
     @Override
     public byte[] serialize() {

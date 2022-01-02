@@ -3,8 +3,6 @@ package bgu.spl.net.impl.BGSServer;
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.impl.BGSServer.Messages.*;
 
-import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class BGSEncDec implements MessageEncoderDecoder<Message> {

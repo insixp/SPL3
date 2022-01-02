@@ -2,8 +2,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
-
-import java.nio.charset.StandardCharsets;
+import bgu.spl.net.impl.BGSServer.User;
 
 public class RegisterMsg extends Message{
     public String  username;
@@ -17,7 +16,16 @@ public class RegisterMsg extends Message{
         super(MessageCode.REGISTER.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){
+        User user = db.get(this.username);
+        if(user != null) {
+            this.sendError();
+        } else {
+            db.register(this.username, this.password, this.birthday);
+            AckMsg ackMsg = new AckMsg();
+            connections.send(connId, ackMsg);
+        }
+    }
 
     @Override
     public byte[] serialize() {

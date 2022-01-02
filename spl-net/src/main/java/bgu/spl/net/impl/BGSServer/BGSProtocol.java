@@ -29,7 +29,10 @@ public class BGSProtocol implements BidiMessagingProtocol<Message> {
     @Override
     public void process(Message message) {
         try {
-            message.process(this.db, this.connections, this.connectionId);
+            message.setConnections(this.connections);
+            message.setDb(this.db);
+            message.setConnId(this.connectionId);
+            message.process();
         } catch (IOException e) {
             e.printStackTrace();
         }

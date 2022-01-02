@@ -2,6 +2,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
+import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
 
@@ -17,7 +18,21 @@ public class LoginMsg extends Message{
     }
 
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){
+        User user = db.get(this.username);
+        if(user == null){
+            this.sendError();
+        } else {
+            if(!user.getPassword().equals(this.password)){
+                this.sendError();
+            } else {
+                user.setLogged_in(true);
+                user.setConnectionID(this.connId);
+                AckMsg ackMsg = new AckMsg();
+                this.connections.send(connId, ackMsg);
+            }
+        }
+    }
 
     @Override
     public byte[] serialize() {

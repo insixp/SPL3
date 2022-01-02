@@ -13,7 +13,7 @@ public class StatsMsg extends Message{
         super(MessageCode.STATS.OPCODE);
     }
 
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){}
 
     @Override
     public byte[] serialize() {

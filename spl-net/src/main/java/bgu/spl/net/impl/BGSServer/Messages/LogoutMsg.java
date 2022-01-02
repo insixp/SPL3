@@ -2,6 +2,7 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
+import bgu.spl.net.impl.BGSServer.User;
 
 public class LogoutMsg extends Message{
 
@@ -10,7 +11,17 @@ public class LogoutMsg extends Message{
     }
 
     @Override
-    public void process(Database db, Connections<Message> connections, int connId){}
+    public void process(){
+        User user = this.db.search(this.connId);
+        if(user == null){
+            this.sendError();
+        } else {
+            user.setLogged_in(false);
+            user.setConnectionID(-1);
+            AckMsg ackMsg = new AckMsg();
+            this.connections.send(this.connId, ackMsg);
+        }
+    }
 
     @Override
     public byte[] serialize() {
