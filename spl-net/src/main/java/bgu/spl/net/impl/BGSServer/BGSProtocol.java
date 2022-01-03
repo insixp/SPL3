@@ -2,9 +2,7 @@ package bgu.spl.net.impl.BGSServer;
 
 import bgu.spl.net.api.bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.bidi.Connections;
-import bgu.spl.net.impl.BGSServer.Messages.ErrorMsg;
 import bgu.spl.net.impl.BGSServer.Messages.Message;
-import bgu.spl.net.impl.BGSServer.Messages.RegisterMsg;
 
 import java.io.IOException;
 

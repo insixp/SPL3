@@ -14,6 +14,7 @@ public class RegisterMsg extends Message{
     }
 
     public void process(){
+        System.out.println("Register message recieved");
         User user = db.get(this.username);
         if(user != null) {
             this.sendError();

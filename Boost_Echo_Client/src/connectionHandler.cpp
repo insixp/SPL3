@@ -1,4 +1,5 @@
 #include <connectionHandler.h>
+#include <utils.h>
  
 using boost::asio::ip::tcp;
 
@@ -62,23 +63,25 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     }
     return true;
 }
- 
-bool ConnectionHandler::getLine(std::string& line) {
-    return getFrameAscii(line, '\n');
-}
 
-bool ConnectionHandler::sendLine(std::string& line) {
-    return sendFrameAscii(line, '\n');
-}
- 
-bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
+bool ConnectionHandler::getMessageASCII(OP_CODES& opcode, std::string& frame, char delimiter) {
     char ch;
-    // Stop when we encounter the null character. 
-    // Notice that the null character is not appended to the frame string.
+    char opcode_bytes[2];
+    int count = 0;
     try {
 		do{
 			getBytes(&ch, 1);
-            frame.append(1, ch);
+            if(count == 0){
+                opcode_bytes[0] = ch;
+                count++;
+            }
+            if(count == 1){
+                opcode_bytes[1] = ch;
+                count++;
+                opcode = (OP_CODES)bytesToShort(opcode_bytes);
+            } else {
+                frame.append(1, ch);
+            }
         }while (delimiter != ch);
     } catch (std::exception& e) {
         std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
@@ -87,8 +90,11 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     return true;
 }
  
-bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
-	bool result=sendBytes(frame.c_str(),frame.length());
+bool ConnectionHandler::SendMessageASCII(const OP_CODES& opcode, const std::string& frame, char delimiter) {
+    char opcode_bytes[frame.length() + 2];
+    shortToBytes(opcode, opcode_bytes);
+    std::copy(frame.c_str(), frame.c_str() + frame.length(), &opcode_bytes[2]);
+	bool result= sendBytes(opcode_bytes, frame.length() + 2);
 	if(!result) return false;
 	return sendBytes(&delimiter,1);
 }

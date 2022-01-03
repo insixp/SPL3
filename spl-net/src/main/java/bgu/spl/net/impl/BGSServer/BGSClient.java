@@ -39,8 +39,10 @@ public class BGSClient {
             int read;
             while((read = in.read()) >= 0){
                 Message m = encdec.decodeNextByte((byte)read);
-                if(m != null)
+                if(m != null) {
                     System.out.println(m);
+                    break;
+                }
             }
 
             msg = new RegisterMsg();
@@ -51,8 +53,10 @@ public class BGSClient {
 
             while((read = in.read()) >= 0){
                 Message m = encdec.decodeNextByte((byte)read);
-                if(m != null)
+                if(m != null) {
                     System.out.println(m);
+                    break;
+                }
             }
         }
     }
