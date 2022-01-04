@@ -6,10 +6,12 @@ import bgu.spl.net.impl.BGSServer.Database;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.LinkedList;
 
 public class AckMsg extends Message{
     private short    msgOpCode;
-    private String FollowedUsername="";
+    private LinkedList<String>optional=new LinkedList<>();
+    //private String FollowedUsername="";
     public AckMsg(){
         super(MessageCode.ACK.OPCODE);
     }
@@ -21,9 +23,8 @@ public class AckMsg extends Message{
     public void setMsgOpCode(short msgOpCode) {
         this.msgOpCode = msgOpCode;
     }
-    public void setFollowedUsername(String username){
-        this.FollowedUsername=username;
-    }
+
+    public void setOptional(LinkedList<String>l){optional=l;}
     @Override
     public void process() throws IOException{
         throw new IOException("Recieved Ack msg inside the server");
@@ -31,7 +32,12 @@ public class AckMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        return this.StringtoByte(shortToString(opcode) + shortToString(this.msgOpCode) + FollowedUsername);
+        String ans="";
+        ans=ans+shortToString(opcode) + shortToString(this.msgOpCode);
+        for(int i=0;i<optional.size();i++){
+            ans=ans+optional.get(i);
+        }
+        return this.StringtoByte(ans);
     }
 
     @Override

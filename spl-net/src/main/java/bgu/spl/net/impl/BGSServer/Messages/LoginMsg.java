@@ -5,6 +5,7 @@ import bgu.spl.net.impl.BGSServer.Database;
 import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Queue;
 
 public class LoginMsg extends Message{
     public String  username;
@@ -26,6 +27,7 @@ public class LoginMsg extends Message{
             } else {
                 user.setLogged_in(true);
                 user.setConnectionID(this.connId);
+                this.sendBackup(user);
                 AckMsg ackMsg = new AckMsg();
                 this.connections.send(connId, ackMsg);
             }
@@ -56,6 +58,11 @@ public class LoginMsg extends Message{
             this.data.add(data);
         }
     }
-
+    private void sendBackup(User user){
+        Queue<PostMsg> q=user.getBackupMesseges();
+        while(!q.isEmpty()){
+            this.connections.send(this.connId,q.poll());
+        }
+    }
 
 }

@@ -21,31 +21,37 @@ public class FollowUnfollowMsg extends Message{
         else
             processUnfollow();
     }
-    public void processFollow(){
-        User user=db.search(this.connId);
-        LinkedList<String> folowers=user.getFollowList();
-        if(user.getLogged_in()&& !folowers.contains(this.username)){
-            folowers.add(username);
+    private void processFollow(){
+        User MeUser=db.search(this.connId);
+        User FoUser=db.get(username);
+        LinkedList<String> folowers=MeUser.getUsersIFollowList();
+        if(FoUser!=null&& MeUser.getLogged_in() && !folowers.contains(this.username)){
+            MeUser.addToUsersIFollow(username);
+            FoUser.addToFollowMe(MeUser.getUsername());
             AckMsg ackMsg=new AckMsg();
             ackMsg.setMsgOpCode(opcode);
-            ackMsg.setFollowedUsername(this.username);
+            LinkedList<String>U=new LinkedList<>();
+            U.add(username);
+            ackMsg.setOptional(U);
             connections.send(connId,ackMsg);
         }
         else{
             this.sendError();
         }
     }
-    public void processUnfollow(){
-        User user=db.search(this.connId);
-        LinkedList<String> folowers=user.getFollowList();
-        if(user.getLogged_in()&& folowers.contains(this.username)){
-            folowers.remove(username);
-            AckMsg ackMsg=new AckMsg();
-            ackMsg.setMsgOpCode(opcode);
-            ackMsg.setFollowedUsername(this.username);
-            connections.send(connId,ackMsg);
-        }
-        else{
+    private void processUnfollow() {
+        User MeUser = db.search(this.connId);
+        User FoUser = db.get(username);
+        LinkedList<String> folowers = MeUser.getUsersIFollowList();
+        if (FoUser != null && MeUser.getLogged_in() && folowers.contains(this.username)) {
+            MeUser.removeUsersIFollow(username);
+            FoUser.removeFollowMe(MeUser.getUsername());
+            AckMsg ackMsg = new AckMsg();
+            LinkedList<String>U=new LinkedList<>();
+            U.add(username);
+            ackMsg.setOptional(U);
+            connections.send(connId, ackMsg);
+        } else {
             this.sendError();
         }
     }

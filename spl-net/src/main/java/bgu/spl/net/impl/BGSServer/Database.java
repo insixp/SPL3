@@ -13,7 +13,7 @@ public class Database {
 
     ConcurrentHashMap<String, User>  usernameToUserDBHS;
     SavedMessegesData SavedMesseges;
-
+    private String[] filterWords={"goku","gohan","mkita"};
     private static class singletonHolder{
         private static Database instance = new Database();
     }
@@ -56,10 +56,12 @@ public class Database {
         }
         return null;
     }
+    public String[] getFilterWords(){return this.filterWords;}
     public void saveMesssege(NotificationMsg noti){
         this.SavedMesseges.insertPM(noti);
     }
     public void saveMessege(PostMsg post){
         this.SavedMesseges.insertPost(post);
     }
+    public LinkedList<User> getUsersList(){return (LinkedList<User>) this.users;}
 }

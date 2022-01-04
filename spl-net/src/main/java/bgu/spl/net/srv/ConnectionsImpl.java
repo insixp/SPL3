@@ -10,15 +10,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionsImpl<T> implements Connections<T> {
 
-    ConcurrentHashMap<Integer, ConnectionHandler<T>>    connectionIdHM;
+    ConcurrentHashMap<Integer, ConnectionHandler<T>> connectionIdHM;
     private int connectionIdIndex;
 
-    public ConnectionsImpl(){
+    public ConnectionsImpl() {
         this.connectionIdHM = new ConcurrentHashMap<Integer, ConnectionHandler<T>>();
         this.connectionIdIndex = 0;
     }
 
-    public int register(ConnectionHandler<T> connectionHandler){
+    public int register(ConnectionHandler<T> connectionHandler) {
         int connID = this.connectionIdIndex;
         this.connectionIdHM.put(connID, connectionHandler);
         this.connectionIdIndex++;
@@ -28,7 +28,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
     @Override
     public boolean send(int connectionId, T msg) {
         ConnectionHandler connectionHandler = this.connectionIdHM.get(connectionId);
-        if(connectionHandler == null)
+        if (connectionHandler == null)
             return false;
         connectionHandler.send(msg);
         return true;
@@ -38,9 +38,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
     public void broadcast(T msg) {
         Queue<ConnectionHandler> sendingQueue = new LinkedList<>(Collections.list(this.connectionIdHM.elements()));
         ConnectionHandler connectionHandler;
-        while(!sendingQueue.isEmpty()){
+        while (!sendingQueue.isEmpty()) {
             connectionHandler = sendingQueue.poll();
-            if(!connectionHandler.trySend(msg))
+            if (!connectionHandler.trySend(msg))
                 sendingQueue.add(connectionHandler);
         }
     }
@@ -48,5 +48,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
     @Override
     public void disconnect(int connectionId) {
         this.connectionIdHM.remove(connectionId);
+    }
+
+    public ConnectionHandler getConnectionHandler(int connectionId) {
+        return this.connectionIdHM.get(connectionId);
     }
 }
