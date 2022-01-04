@@ -15,7 +15,7 @@ ConnectionHandler::~ConnectionHandler() {
     close();
 }
  
-bool ConnectionHandler::connect() {
+void ConnectionHandler::connect() {
     std::cout << "Starting connect to " 
         << host_ << ":" << port_ << std::endl;
     try {
@@ -27,12 +27,11 @@ bool ConnectionHandler::connect() {
     }
     catch (std::exception& e) {
         std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
-        return false;
+        throw;
     }
-    return true;
 }
  
-bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
+void ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
     size_t tmp = 0;
 	boost::system::error_code error;
     try {
@@ -42,13 +41,11 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
 		if(error)
 			throw boost::system::system_error(error);
     } catch (std::exception& e) {
-        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
-        return false;
+        throw;
     }
-    return true;
 }
 
-bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
+void ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     int tmp = 0;
 	boost::system::error_code error;
     try {
@@ -58,45 +55,54 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 		if(error)
 			throw boost::system::system_error(error);
     } catch (std::exception& e) {
-        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
-        return false;
+        throw;
     }
-    return true;
 }
 
-bool ConnectionHandler::getMessageASCII(OP_CODES& opcode, std::string& frame, char delimiter) {
+void ConnectionHandler::getString(std::string& frame) {
     char ch;
-    char opcode_bytes[2];
-    int count = 0;
     try {
 		do{
 			getBytes(&ch, 1);
-            if(count == 0){
-                opcode_bytes[0] = ch;
-                count++;
-            }
-            if(count == 1){
-                opcode_bytes[1] = ch;
-                count++;
-                opcode = (OP_CODES)bytesToShort(opcode_bytes);
-            } else {
-                frame.append(1, ch);
-            }
-        }while (delimiter != ch);
+            frame.append(1, ch);
+        }while (ch != '\0');
     } catch (std::exception& e) {
-        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
-        return false;
+        throw;
     }
-    return true;
+}
+
+void ConnectionHandler::getShort(char bytes[]){
+    try {
+        getBytes(&bytes[0], 1);
+        getBytes(&bytes[1], 1);
+    } catch (std::exception& e) {
+        throw;
+    }
+}
+
+void ConnectionHandler::getRestOfMessage(std::string& frame, char delimiter){
+    char ch;
+    try {
+		do{
+			getBytes(&ch, 1);
+            frame.append(1, ch);
+        }while (ch != delimiter);
+    } catch (std::exception& e) {
+        throw;
+    }
 }
  
-bool ConnectionHandler::SendMessageASCII(const OP_CODES& opcode, const std::string& frame, char delimiter) {
-    char opcode_bytes[frame.length() + 2];
+void ConnectionHandler::SendMessageASCII(const OP_CODES& opcode, const std::string& frame, char delimiter) {
+    char opcode_bytes[frame.length() + 3];
     shortToBytes(opcode, opcode_bytes);
     std::copy(frame.c_str(), frame.c_str() + frame.length(), &opcode_bytes[2]);
-	bool result= sendBytes(opcode_bytes, frame.length() + 2);
-	if(!result) return false;
-	return sendBytes(&delimiter,1);
+    opcode_bytes[frame.length() + 2] = ';';
+    try{
+	    sendBytes(opcode_bytes, frame.length() + 3);
+    } catch(std::exception& e) {
+        throw;
+    }
+	
 }
  
 // Close down the connection properly.

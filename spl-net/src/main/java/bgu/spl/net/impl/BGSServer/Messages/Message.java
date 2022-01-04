@@ -12,7 +12,7 @@ public abstract class Message {
     protected short  opcode;
     protected LinkedList<Byte> data;
     protected int content_index;
-    protected byte[] buff = new byte[1 << 10];
+    protected byte[] buff = new byte[64];
     private int len;
     protected Connections<Message> connections;
     protected Database db;

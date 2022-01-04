@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <ctime>
 
 senderTask::senderTask(ConnectionHandler& connectionHandler, std::mutex& mutex, int _id): 
 connectionHandler(connectionHandler),
@@ -15,20 +16,108 @@ void senderTask::run(){
     std::vector<std::string> command(0);
 
     std::string line;
-    
+
     while(1){
+
+        command.clear();
         getline(std::cin, line);
-    
+
         std::istringstream stream(line);
-        // // Parse command
+        // Parse command
         std::string word;
+        std::string message;
+        OP_CODES opcode;
         while (stream >> word) {
             command.push_back(word);
         }
-         if(command[0].compare("REGISTER") == 0){
-            this->mutex.lock();
-            this->connectionHandler.SendMessageASCII(OP_CODES::REGISTER, command[1] + '\0' + command[2] + '\0' + command[3] + '\0', ';');
-            this->mutex.unlock();
+
+        if(command[0].compare("REGISTER") == 0){
+            if(command.size() != 4){
+                std::cout << "Register command must have 3 arguments" << std::endl;
+                continue;
+            }
+            message = command[1] + '\0' + command[2] + '\0' + command[3] + '\0';
+            opcode = OP_CODES::REGISTER;
+        }
+        else if(command[0].compare("LOGIN") == 0){
+            if(command.size() != 4){
+                std::cout << "Login command must have 3 arguments" << std::endl;
+                continue;
+            }
+            char capcha;
+            if(command[3].compare("1") == 0)
+                capcha = '\1';
+            else
+                capcha = '\0';
+            message = command[1] + '\0' + command[2] + '\0' + capcha;
+            opcode = OP_CODES::LOGIN;
+        }
+        else if(command[0].compare("FOLLOW") == 0){
+            if(command.size() != 3 || command[1].size() != 1){
+                std::cout << "Follow command must have 2 arguments and argument 1 must be 0/1" << std::endl;
+                continue;
+            }
+            message = command[1] + command[2] + '\x00';
+            opcode = OP_CODES::FOLLOW;
+        }
+        else if(command[0].compare("POST") == 0){
+            if(command.size() != 2){
+                std::cout << "Follow command must have 1 arguments" << std::endl;
+                continue;
+            }
+            message = command[1] + '\x00';
+            opcode = OP_CODES::POST;
+        }
+        else if(command[0].compare("POST") == 0){
+            if(command.size() != 2){
+                std::cout << "POST command must have 1 arguments" << std::endl;
+                continue;
+            }
+            message = command[1] + '\x00';
+            opcode = OP_CODES::POST;
+        }
+        else if(command[0].compare("PM") == 0){
+            if(command.size() != 3){
+                std::cout << "PM command must have 2 arguments" << std::endl;
+                continue;
+            }
+            std::time_t now = std::time(nullptr);
+            std::tm* info = std::localtime(&now);
+            char buff[64];
+            std::strftime(buff, 64, "%d-%m-%Y %H:%M", info);
+            message = command[1] + '\x00' + command[2] + '\x00' + buff + '\x00';
+            opcode = OP_CODES::POST;
+        }
+        else if(command[0].compare("LOGSTAT") == 0){
+            if(command.size() != 1){
+                std::cout << "LOGSTAT command must have 0 arguments" << std::endl;
+                continue;
+            }
+            message = "";
+            opcode = OP_CODES::POST;
+        }
+        else if(command[0].compare("STAT") == 0){
+            if(command.size() != 2){
+                std::cout << "STAT command must have 1 arguments" << std::endl;
+                continue;
+            }
+            message = command[1] + '\x00';
+            opcode = OP_CODES::POST;
+        }
+        else if(command[0].compare("BLOCK") == 0){
+            if(command.size() != 2){
+                std::cout << "STAT command must have 1 arguments" << std::endl;
+                continue;
+            }
+            message = command[1] + '\x00';
+            opcode = OP_CODES::POST;
+        }
+
+        try{
+            this->connectionHandler.SendMessageASCII(opcode, message, ';');
+        } catch (std::exception& e){
+            std::cout << "Could not send message" << std::endl;
+            break;
         }
     }
 }

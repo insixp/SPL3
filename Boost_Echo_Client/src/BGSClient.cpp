@@ -14,8 +14,10 @@ int main (int argc, char *argv[]) {
     short port = atoi(argv[2]);
     
     ConnectionHandler connectionHandler(host, port);
-    if (!connectionHandler.connect()) {
-        std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
+    try {
+        connectionHandler.connect();
+    } catch (std::exception& e) {
+        std::cerr << "Cannot connect to " << host << ":" << port << " - " << e.what() << std::endl;
         return 1;
     }
 
@@ -23,10 +25,34 @@ int main (int argc, char *argv[]) {
     senderTask senderTask_(connectionHandler, mutex, 1);
     std::thread senderThread_(&senderTask::run, &senderTask_);
 	
+    const short bufsize = 1024;
+    char buf[bufsize];
+
     while (1) {
-        const short bufsize = 1024;
-        char buf[bufsize];
+        std::string message;
+        OP_CODES    opcode;
+        try{
+            char short_bytes[2];
+            connectionHandler.getShort(short_bytes);
+            opcode = (OP_CODES)bytesToShort(short_bytes);
+            if(opcode == ACK){
+                connectionHandler.getShort(short_bytes);
+                OP_CODES preMsgOpCode = (OP_CODES)bytesToShort(short_bytes);
+                std::cout << "Message(" + std::to_string(preMsgOpCode) + ") recieved" << std::endl;
+                connectionHandler.getRestOfMessage(message, ';');
+            }
+            else if(opcode == ERROR){
+                connectionHandler.getShort(short_bytes);
+                OP_CODES preMsgOpCode = (OP_CODES)bytesToShort(short_bytes);
+                std::cout << "Message(" + std::to_string(preMsgOpCode) + ") error" << std::endl;
+                connectionHandler.getRestOfMessage(message, ';');
+            }
+        } catch (std::exception& e) {
+            std::cout << "Could not recieve message (" << e.what() << ")" << std::endl;
+            break;
+        }
     }
+    senderThread_.join();
     return 0;
 }
 

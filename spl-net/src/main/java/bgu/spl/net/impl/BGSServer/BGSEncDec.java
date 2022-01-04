@@ -62,6 +62,7 @@ public class BGSEncDec implements MessageEncoderDecoder<Message> {
             return null;
         }
         buff_index = 0;
+        System.out.println(decodedMessage);
         return decodedMessage;
     }
 
