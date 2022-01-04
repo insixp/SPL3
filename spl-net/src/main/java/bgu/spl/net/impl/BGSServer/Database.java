@@ -8,12 +8,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Database {
 
     ConcurrentHashMap<String, User>  usernameToUserDBHS;
     SavedMessegesData SavedMesseges;
+    //ReentrantLock FollowList=new ReentrantLock();   ask CHUPA
     private String[] filterWords={"goku","gohan","mkita"};
+
     private static class singletonHolder{
         private static Database instance = new Database();
     }

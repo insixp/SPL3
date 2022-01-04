@@ -27,8 +27,7 @@ public class PostMsg extends Message{
         if(user.getLogged_in()){
         ConnectionsImpl<Message> tempConnections=new ConnectionsImpl();
         PostMsg myPost=new PostMsg();
-        myPost.setContent(content);
-
+        myPost.setContent(filter(content));
         LinkedList<String> followMe=user.getFollowMeList();
         LinkedList<Integer> ShtrudelUsers=findShtrudel(content);
         for(int i=0;i<followMe.size();i++){//all the users that follow me

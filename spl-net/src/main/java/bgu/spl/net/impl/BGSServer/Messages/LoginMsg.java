@@ -19,7 +19,7 @@ public class LoginMsg extends Message{
 
     public void process(){
         User user = db.get(this.username);
-        if(user == null){
+        if(user == null||this.captcha==0){
             this.sendError();
         } else {
             if(!user.getPassword().equals(this.password)){
@@ -27,9 +27,10 @@ public class LoginMsg extends Message{
             } else {
                 user.setLogged_in(true);
                 user.setConnectionID(this.connId);
-                this.sendBackup(user);
                 AckMsg ackMsg = new AckMsg();
+                ackMsg.setMsgOpCode(this.opcode);
                 this.connections.send(connId, ackMsg);
+                this.sendBackup(user);
             }
         }
     }
@@ -60,7 +61,7 @@ public class LoginMsg extends Message{
     }
     private void sendBackup(User user){
         Queue<PostMsg> q=user.getBackupMesseges();
-        while(!q.isEmpty()){
+        while(!q.isEmpty()&&user.getLogged_in()){
             this.connections.send(this.connId,q.poll());
         }
     }

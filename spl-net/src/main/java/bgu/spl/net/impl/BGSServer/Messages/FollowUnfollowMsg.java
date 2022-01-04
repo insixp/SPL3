@@ -25,7 +25,8 @@ public class FollowUnfollowMsg extends Message{
         User MeUser=db.search(this.connId);
         User FoUser=db.get(username);
         LinkedList<String> folowers=MeUser.getUsersIFollowList();
-        if(FoUser!=null&& MeUser.getLogged_in() && !folowers.contains(this.username)){
+        if(FoUser!=null&& MeUser.getLogged_in() && !folowers.contains(this.username)&&
+        !MeUser.getBlockedMeList().contains(username)){
             MeUser.addToUsersIFollow(username);
             FoUser.addToFollowMe(MeUser.getUsername());
             AckMsg ackMsg=new AckMsg();

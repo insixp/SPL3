@@ -20,7 +20,8 @@ public class PMMsg extends Message{
         User sendUser=db.search(this.connId);
         User reciveUser=db.get(username);
         int reciveID=reciveUser.getConnectionID();
-        if(reciveUser!=null && sendUser.getLogged_in() && sendUser.getUsersIFollowList().contains(username)){
+        if(reciveUser!=null && sendUser.getLogged_in() && sendUser.getUsersIFollowList().contains(username)&&
+                !sendUser.getBlockedMeList().contains(username)){
             NotificationMsg noti=new NotificationMsg();
             noti.setContent(filter(content));
             AckMsg ackmsg=new AckMsg();

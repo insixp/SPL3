@@ -19,6 +19,7 @@ public class LogoutMsg extends Message{
             user.setLogged_in(false);
             user.setConnectionID(-1);
             AckMsg ackMsg = new AckMsg();
+            ackMsg.setMsgOpCode(this.opcode);
             this.connections.send(this.connId, ackMsg);
         }
     }

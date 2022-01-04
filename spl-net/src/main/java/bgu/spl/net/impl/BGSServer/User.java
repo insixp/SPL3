@@ -19,12 +19,15 @@ public class User {
     private int numOfPosts;
     private LinkedList<String> UsersIFollowList;
     private LinkedList<String> FollowMeList;
+    private LinkedList<String> BlockedMeList;
     private Queue<PostMsg> backupMesseges;
     ReentrantLock followMeLock=new ReentrantLock();
     ReentrantLock IfollowLock=new ReentrantLock();
+    ReentrantLock blockLock=new ReentrantLock();
     public User(){
         this.UsersIFollowList=new LinkedList<>();
         this.FollowMeList=new LinkedList<>();
+        this.BlockedMeList=new LinkedList<>();
         this.backupMesseges=new LinkedBlockingQueue<>();
         this.numOfPosts=0;
     }
@@ -33,34 +36,54 @@ public class User {
     public Queue<PostMsg> getBackupMesseges() {
         return backupMesseges;
     }
-    public LinkedList<String> getUsersIFollowList(){return this.UsersIFollowList;}
-
-    public LinkedList<String> getFollowMeList(){return this.FollowMeList;}
-
+    public LinkedList<String> getUsersIFollowList(){
+        LinkedList<String> copy=new LinkedList<>();
+        IfollowLock.lock();
+        for(int i=0;i<this.UsersIFollowList.size();i++){
+            copy.add(UsersIFollowList.get(i));
+             }
+        IfollowLock.unlock();
+        return copy;
+        }
+    public LinkedList<String> getBlockedMeList(){
+        LinkedList<String> copy=new LinkedList<>();
+        blockLock.lock();
+        for(int i=0;i<this.BlockedMeList.size();i++){
+            copy.add(BlockedMeList.get(i));
+        }
+        blockLock.unlock();
+        return copy;
+    }
+    public LinkedList<String> getFollowMeList(){
+        LinkedList<String> copy=new LinkedList<>();
+        followMeLock.lock();
+        for(int i=0;i<this.FollowMeList.size();i++){
+            copy.add(FollowMeList.get(i));
+        }
+        followMeLock.unlock();
+        return copy;
+    }
     public String getUsername() {
         return username;
     }
-
     public void addToFollowMe(String username){
         followMeLock.lock();
         this.FollowMeList.add(username);
         followMeLock.unlock();}
-
     public void removeFollowMe(String username){
         followMeLock.lock();
         this.FollowMeList.remove(username);
         followMeLock.unlock();}
-
     public void addToUsersIFollow(String username){
         IfollowLock.lock();
         this.UsersIFollowList.add(username);
         IfollowLock.unlock();}
-
     public void removeUsersIFollow(String userame){
         IfollowLock.lock();
         this.UsersIFollowList.remove(userame);
         IfollowLock.unlock();}
-
+    public void addToBlockedMe(String username){this.BlockedMeList.add(username);}
+    public void removeBlockedMe(String username){this.BlockedMeList.remove(username);}
     public void pushBackup(PostMsg post){this.backupMesseges.add(post);}
 
     public String getPassword() {

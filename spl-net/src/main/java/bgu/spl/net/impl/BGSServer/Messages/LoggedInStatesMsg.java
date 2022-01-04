@@ -14,20 +14,26 @@ public class LoggedInStatesMsg extends Message{
 
     public void process(){
         User user=db.search(connId);
+        LinkedList<String> information = new LinkedList<>();
+        AckMsg ackMsg = new AckMsg();
+        ackMsg.setMsgOpCode(this.opcode);
         if(user!=null&&user.getLogged_in()){
             LinkedList<User> users=db.getUsersList();
-            for(int i=0;i<users.size();i++){
-                User tempuser=users.get(i);
-                LinkedList<String>information=new LinkedList<>();
-                information.add(tempuser.getAge());
-                information.add(""+tempuser.getNumOfPosts());
-                information.add(""+tempuser.getNumberofFollowers());
-                information.add(""+tempuser.getNumberofFollowing());
-                AckMsg ackMsg=new AckMsg();
-                ackMsg.setMsgOpCode(this.opcode);
-                ackMsg.setOptional(information);
-                this.connections.send(this.connId,ackMsg);
+            for(int i=0;i<users.size();i++) {
+                User tempuser = users.get(i);
+                if (tempuser.getLogged_in()&&!user.getBlockedMeList().contains(tempuser.getUsername())) {
+                    if(i>0){
+                        information.add("10");
+                        information.add("7");
+                    }
+                    information.add(tempuser.getAge());
+                    information.add("" + tempuser.getNumOfPosts());
+                    information.add("" + tempuser.getNumberofFollowers());
+                    information.add("" + tempuser.getNumberofFollowing());
+                }
             }
+            ackMsg.setOptional(information);
+            this.connections.send(this.connId, ackMsg);
         }
         else{
             this.sendError();
