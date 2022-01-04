@@ -24,9 +24,6 @@ int main (int argc, char *argv[]) {
     std::mutex mutex;
     senderTask senderTask_(connectionHandler, mutex, 1);
     std::thread senderThread_(&senderTask::run, &senderTask_);
-	
-    const short bufsize = 1024;
-    char buf[bufsize];
 
     while (1) {
         std::string message;
@@ -46,6 +43,23 @@ int main (int argc, char *argv[]) {
                 OP_CODES preMsgOpCode = (OP_CODES)bytesToShort(short_bytes);
                 std::cout << "Message(" + std::to_string(preMsgOpCode) + ") error" << std::endl;
                 connectionHandler.getRestOfMessage(message, ';');
+            }
+            else if(opcode == NOTIFICATION){
+                char notificationType[1];
+                std::string notiType;
+                std::string username;
+                std::string content;
+                connectionHandler.getBytes(notificationType, 1);
+                if(notificationType[0] == '\0')
+                    notiType = "PM";
+                else
+                    notiType = "Public";
+                connectionHandler.getString(username);
+                connectionHandler.getRestOfMessage(content, ';');
+                std::cout << "NOTIFICATION " << notiType << " " << username << " " << content << std::endl;
+            } else {
+                std::cerr << "Recieved unrecognized message type" << std::endl;
+                continue;
             }
         } catch (std::exception& e) {
             std::cout << "Could not recieve message (" << e.what() << ")" << std::endl;
