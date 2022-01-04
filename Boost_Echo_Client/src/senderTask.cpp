@@ -52,6 +52,14 @@ void senderTask::run(){
             message = command[1] + '\0' + command[2] + '\0' + capcha;
             opcode = OP_CODES::LOGIN;
         }
+        else if(command[0].compare("LOGOUT") == 0){
+            if(command.size() != 1){
+                std::cout << "Logout command must have 0 arguments" << std::endl;
+                continue;
+            }
+            message = "";
+            opcode = OP_CODES::LOGOUT;
+        }
         else if(command[0].compare("FOLLOW") == 0){
             if(command.size() != 3 || command[1].size() != 1){
                 std::cout << "Follow command must have 2 arguments and argument 1 must be 0/1" << std::endl;
@@ -59,14 +67,6 @@ void senderTask::run(){
             }
             message = command[1] + command[2] + '\x00';
             opcode = OP_CODES::FOLLOW;
-        }
-        else if(command[0].compare("POST") == 0){
-            if(command.size() != 2){
-                std::cout << "Follow command must have 1 arguments" << std::endl;
-                continue;
-            }
-            message = command[1] + '\x00';
-            opcode = OP_CODES::POST;
         }
         else if(command[0].compare("POST") == 0){
             if(command.size() != 2){
@@ -86,7 +86,7 @@ void senderTask::run(){
             char buff[64];
             std::strftime(buff, 64, "%d-%m-%Y %H:%M", info);
             message = command[1] + '\x00' + command[2] + '\x00' + buff + '\x00';
-            opcode = OP_CODES::POST;
+            opcode = OP_CODES::PM;
         }
         else if(command[0].compare("LOGSTAT") == 0){
             if(command.size() != 1){
@@ -94,7 +94,7 @@ void senderTask::run(){
                 continue;
             }
             message = "";
-            opcode = OP_CODES::POST;
+            opcode = OP_CODES::LOGGED_IN_STATS;
         }
         else if(command[0].compare("STAT") == 0){
             if(command.size() != 2){
@@ -102,7 +102,7 @@ void senderTask::run(){
                 continue;
             }
             message = command[1] + '\x00';
-            opcode = OP_CODES::POST;
+            opcode = OP_CODES::STATS;
         }
         else if(command[0].compare("BLOCK") == 0){
             if(command.size() != 2){
@@ -110,7 +110,10 @@ void senderTask::run(){
                 continue;
             }
             message = command[1] + '\x00';
-            opcode = OP_CODES::POST;
+            opcode = OP_CODES::BLOCK;
+        } else {
+            std::cout << "Command not found" << std::endl;
+            continue;
         }
 
         try{
