@@ -20,7 +20,7 @@ public class RegisterMsg extends Message{
         } else {
             db.register(this.username, this.password, this.birthday);
             AckMsg ackMsg = new AckMsg();
-            ackMsg.msgOpCode = this.opcode;
+            ackMsg.setMsgOpCode(this.opcode);
             connections.send(connId, ackMsg);
         }
     }
