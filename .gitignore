@@ -2,31 +2,31 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-spl-net/.idea/*
-spl-net/.idea/**/workspace.xml
-spl-net/.idea/**/tasks.xml
-spl-net/.idea/**/usage.statistics.xml
-spl-net/.idea/**/dictionaries
-spl-net/.idea/**/shelf
+server/.idea/*
+server/.idea/**/workspace.xml
+server/.idea/**/tasks.xml
+server/.idea/**/usage.statistics.xml
+server/.idea/**/dictionaries
+server/.idea/**/shelf
 
 # AWS User-specific
-spl-net/.idea/**/aws.xml
+server/.idea/**/aws.xml
 
 # Generated files
-spl-net/.idea/**/contentModel.xml
+server/.idea/**/contentModel.xml
 
 # Sensitive or high-churn files
-spl-net/.idea/**/dataSources/
-spl-net/.idea/**/dataSources.ids
-spl-net/.idea/**/dataSources.local.xml
-spl-net/.idea/**/sqlDataSources.xml
-spl-net/.idea/**/dynamic.xml
-spl-net/.idea/**/uiDesigner.xml
-spl-net/.idea/**/dbnavigator.xml
+server/.idea/**/dataSources/
+server/.idea/**/dataSources.ids
+server/.idea/**/dataSources.local.xml
+server/.idea/**/sqlDataSources.xml
+server/.idea/**/dynamic.xml
+server/.idea/**/uiDesigner.xml
+server/.idea/**/dbnavigator.xml
 
 # Gradle
-spl-net/.idea/**/gradle.xml
-spl-net/.idea/**/libraries
+server/.idea/**/gradle.xml
+server/.idea/**/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
@@ -73,10 +73,10 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
-spl-net/spl-net.iml
+server/spl-net.iml
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 target/
-Boost_Echo_Client/bin/*
+client/bin/*
 .vscode
