@@ -2,8 +2,10 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
+import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 
 public class FollowUnfollowMsg extends Message{
     public byte         action;
@@ -13,8 +15,46 @@ public class FollowUnfollowMsg extends Message{
         super(MessageCode.FOLLOW.OPCODE);
     }
 
-    public void process(){}
-
+    public void process(){
+        if(action==0)
+            processFollow();
+        else
+            processUnfollow();
+    }
+    private void processFollow(){
+        User MeUser=db.search(this.connId);
+        User FoUser=db.get(username);
+        LinkedList<String> folowers=MeUser.getUsersIFollowList();
+        if(FoUser!=null&& MeUser.getLogged_in() && !folowers.contains(this.username)){
+            MeUser.addToUsersIFollow(username);
+            FoUser.addToFollowMe(MeUser.getUsername());
+            AckMsg ackMsg=new AckMsg();
+            ackMsg.setMsgOpCode(opcode);
+            LinkedList<String>U=new LinkedList<>();
+            U.add(username);
+            ackMsg.setOptional(U);
+            connections.send(connId,ackMsg);
+        }
+        else{
+            this.sendError();
+        }
+    }
+    private void processUnfollow() {
+        User MeUser = db.search(this.connId);
+        User FoUser = db.get(username);
+        LinkedList<String> folowers = MeUser.getUsersIFollowList();
+        if (FoUser != null && MeUser.getLogged_in() && folowers.contains(this.username)) {
+            MeUser.removeUsersIFollow(username);
+            FoUser.removeFollowMe(MeUser.getUsername());
+            AckMsg ackMsg = new AckMsg();
+            LinkedList<String>U=new LinkedList<>();
+            U.add(username);
+            ackMsg.setOptional(U);
+            connections.send(connId, ackMsg);
+        } else {
+            this.sendError();
+        }
+    }
     @Override
     public byte[] serialize() {
         return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username);

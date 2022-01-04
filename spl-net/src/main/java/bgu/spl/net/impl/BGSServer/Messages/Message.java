@@ -17,6 +17,7 @@ public abstract class Message {
     protected Connections<Message> connections;
     protected Database db;
     protected int connId;
+    protected String Date;
 
     //  OPCODES
     public enum MessageCode {
@@ -51,6 +52,7 @@ public abstract class Message {
     public void setDb(Database db) {
         this.db = db;
     }
+
 
     public void setConnId(int connId) {
         this.connId = connId;

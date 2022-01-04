@@ -2,6 +2,9 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
+import bgu.spl.net.impl.BGSServer.User;
+
+import java.util.LinkedList;
 
 public class LoggedInStatesMsg extends Message{
 
@@ -9,7 +12,27 @@ public class LoggedInStatesMsg extends Message{
         super(MessageCode.LOGGED_IN_STATS.OPCODE);
     }
 
-    public void process(){}
+    public void process(){
+        User user=db.search(connId);
+        if(user!=null&&user.getLogged_in()){
+            LinkedList<User> users=db.getUsersList();
+            for(int i=0;i<users.size();i++){
+                User tempuser=users.get(i);
+                LinkedList<String>information=new LinkedList<>();
+                information.add(tempuser.getAge());
+                information.add(""+tempuser.getNumOfPosts());
+                information.add(""+tempuser.getNumberofFollowers());
+                information.add(""+tempuser.getNumberofFollowing());
+                AckMsg ackMsg=new AckMsg();
+                ackMsg.setMsgOpCode(this.opcode);
+                ackMsg.setOptional(information);
+                this.connections.send(this.connId,ackMsg);
+            }
+        }
+        else{
+            this.sendError();
+        }
+    }
 
     @Override
     public byte[] serialize() {

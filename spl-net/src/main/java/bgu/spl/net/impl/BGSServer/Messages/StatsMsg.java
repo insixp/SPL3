@@ -2,8 +2,10 @@ package bgu.spl.net.impl.BGSServer.Messages;
 
 import bgu.spl.net.api.bidi.Connections;
 import bgu.spl.net.impl.BGSServer.Database;
+import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 
 public class StatsMsg extends Message{
     public String  usernames;
@@ -12,7 +14,48 @@ public class StatsMsg extends Message{
         super(MessageCode.STATS.OPCODE);
     }
 
-    public void process(){}
+    public void process(){
+        User user=db.search(connId);
+        if(user!=null&&user.getLogged_in()){
+            LinkedList<User> users=StringToListofUsers(usernames);
+            for(int i=0;i<users.size();i++){
+                User tempuser=users.get(i);
+                if(tempuser!=null) {
+                    LinkedList<String> information = new LinkedList<>();
+                    information.add(tempuser.getAge());
+                    information.add("" + tempuser.getNumOfPosts());
+                    information.add("" + tempuser.getNumberofFollowers());
+                    information.add("" + tempuser.getNumberofFollowing());
+                    AckMsg ackMsg = new AckMsg();
+                    ackMsg.setMsgOpCode(this.opcode);
+                    ackMsg.setOptional(information);
+                    this.connections.send(this.connId, ackMsg);
+                }
+                else{
+                    this.sendError();
+                }
+            }
+        }
+        else{
+            this.sendError();
+        }
+    }
+
+
+    public LinkedList<User> StringToListofUsers(String names){
+        LinkedList<User> ans=new LinkedList<>();
+        String usernames=names;
+        int nextBarack=0;
+        nextBarack=usernames.indexOf("|");
+        while(nextBarack!=-1){
+            String name=usernames.substring(0,nextBarack);
+            User user=db.get(name);
+            ans.add(user);
+            usernames=usernames.substring(nextBarack+1);
+            nextBarack=usernames.indexOf("|");
+        }
+        return ans;
+    }
 
     @Override
     public byte[] serialize() {
