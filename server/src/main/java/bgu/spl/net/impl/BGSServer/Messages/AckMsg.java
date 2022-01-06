@@ -11,7 +11,6 @@ import java.util.LinkedList;
 public class AckMsg extends Message{
     private short    msgOpCode;
     private LinkedList<String>optional=new LinkedList<>();
-    //private String FollowedUsername="";
     public AckMsg(){
         super(MessageCode.ACK.OPCODE);
     }

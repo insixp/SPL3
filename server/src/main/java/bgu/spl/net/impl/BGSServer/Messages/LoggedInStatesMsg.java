@@ -14,26 +14,39 @@ public class LoggedInStatesMsg extends Message{
 
     public void process(){
         User user=db.search(connId);
+        AckMsg ackMsg = new AckMsg();
+        ackMsg.setMsgOpCode(this.opcode);
+        LinkedList<String> information = new LinkedList<>();
         if(user!=null&&user.getLogged_in()){
             LinkedList<User> users=db.getUsersList();
             for(int i=0;i<users.size();i++){
                 User tempuser=users.get(i);
-                LinkedList<String>information=new LinkedList<>();
-                information.add(tempuser.getAge());
-                information.add(""+tempuser.getNumOfPosts());
-                information.add(""+tempuser.getNumberofFollowers());
-                information.add(""+tempuser.getNumberofFollowing());
-                AckMsg ackMsg=new AckMsg();
-                ackMsg.setMsgOpCode(this.opcode);
-                ackMsg.setOptional(information);
-                this.connections.send(this.connId,ackMsg);
+
+                if(tempuser!=null) {
+                    if(tempuser.getLogged_in()) {
+                        if (!user.getBlockedMeList().contains(tempuser.getUsername())) {
+                            if (i > 0) {
+                                information.add("10");
+                                information.add("7");
+                            }
+                            information.add(tempuser.getAge());
+                            information.add("" + tempuser.getNumOfPosts());
+                            information.add("" + tempuser.getNumberofFollowers());
+                            information.add("" + tempuser.getNumberofFollowing());
+                        }
+                    }
+                }
+                else{
+                    this.sendError();
+                }
             }
+            ackMsg.setOptional(information);
+            this.connections.send(this.connId, ackMsg);
         }
         else{
             this.sendError();
         }
     }
-
     @Override
     public byte[] serialize() {
         return this.StringtoByte(shortToString(opcode));

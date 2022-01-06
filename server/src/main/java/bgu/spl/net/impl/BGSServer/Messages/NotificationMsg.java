@@ -24,7 +24,7 @@ public class NotificationMsg extends Message{
     public byte[] serialize() {
         return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username + '\0' + this.content + '\0');
     }
-
+    public void setUsername(String username){this.username=username;}
     public void setContent(String content) {
         this.content = content;
     }

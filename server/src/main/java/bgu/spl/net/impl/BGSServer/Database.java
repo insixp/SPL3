@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGSServer;
 
+import bgu.spl.net.api.bidi.ConnectionHandler;
 import bgu.spl.net.impl.BGSServer.Messages.NotificationMsg;
 import bgu.spl.net.impl.BGSServer.Messages.PostMsg;
 import bgu.spl.net.impl.BGSServer.Messages.SavedMessegesData;
@@ -7,6 +8,7 @@ import bgu.spl.net.impl.BGSServer.Messages.SavedMessegesData;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -53,9 +55,13 @@ public class Database {
 
     public User search(int connId){
         List<User>  users = Collections.list(this.usernameToUserDBHS.elements());
+        int counter =0;
         for(User user : users){
+            counter++;
             if(user.getConnectionID() == connId)
                 return user;
+            if(counter>3)
+                return null;
         }
         return null;
     }
@@ -66,5 +72,6 @@ public class Database {
     public void saveMessege(PostMsg post){
         this.SavedMesseges.insertPost(post);
     }
-    public LinkedList<User> getUsersList(){return (LinkedList<User>) this.users;}
+    public LinkedList<User> getUsersList(){
+        return new LinkedList<>(Collections.list(this.usernameToUserDBHS.elements()));}
 }
