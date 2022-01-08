@@ -12,17 +12,18 @@ public class LoggedInStatesMsg extends Message{
         super(MessageCode.LOGGED_IN_STATS.OPCODE);
     }
 
+    @Override
     public void process(){
-        User user=db.search(connId);
+        User user = db.search(connId);
         AckMsg ackMsg = new AckMsg();
         ackMsg.setMsgOpCode(this.opcode);
         LinkedList<String> information = new LinkedList<>();
-        if(user!=null && user.getLogged_in()){
-            LinkedList<User> users=db.getUsersList();
+        if(user != null && user.getLogged_in()){
+            LinkedList<User> users = db.getUsersList();
             for(int i=0;i<users.size();i++){
-                User tempuser=users.get(i);
-                if(tempuser!=null) {
-                    if(tempuser.getLogged_in()&&!user.isBlock(tempuser.getUsername())) {
+                User tempuser = users.get(i);
+                if(tempuser != null) {
+                    if(tempuser.getLogged_in() && !user.isBlocked(tempuser.getUsername())) {
                             if (i > 0) {
                                 information.add("10");
                                 information.add("7");
@@ -44,6 +45,7 @@ public class LoggedInStatesMsg extends Message{
             this.sendError();
         }
     }
+
     @Override
     public byte[] serialize() {
         return this.StringtoByte(shortToString(opcode));

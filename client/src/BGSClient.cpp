@@ -21,11 +21,11 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
-    std::mutex mutex;
-    senderTask senderTask_(connectionHandler, mutex, 1);
+    senderTask senderTask_(connectionHandler, 1);
     std::thread senderThread_(&senderTask::run, &senderTask_);
+    bool terminate = false;
 
-    while (1) {
+    while (!terminate) {
         std::string message;
         OP_CODES    opcode;
         try{
@@ -35,10 +35,20 @@ int main (int argc, char *argv[]) {
             if(opcode == ACK){
                 connectionHandler.getShort(short_bytes);
                 OP_CODES preMsgOpCode = (OP_CODES)bytesToShort(short_bytes);
-                std::string ACK_print = "ACK " + std::to_string(preMsgOpCode);
-                if(preMsgOpCode == LOGGED_IN_STATS || preMsgOpCode == STATS){
+                std::string ACK_print = "ACK " + std::to_string(preMsgOpCode) + " ";
+                if(preMsgOpCode == FOLLOW) {
+                    std::string username;
+                    std::string dump;
+                    connectionHandler.getString(username);
+                    ACK_print += username;
+                }
+                else if(preMsgOpCode == LOGGED_IN_STATS || preMsgOpCode == STATS){
                     connectionHandler.getRestOfMessage(message, ';');
                     ACK_print += message.substr(0, message.size()-2);
+                }
+                else if(preMsgOpCode == LOGOUT) {
+                    terminate = true;
+                    senderTask_.shouldTerminate();
                 }
                 std::cout << ACK_print << std::endl;
                 connectionHandler.getRestOfMessage(message, ';');

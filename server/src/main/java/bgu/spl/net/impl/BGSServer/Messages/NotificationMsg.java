@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class NotificationMsg extends Message{
 
-    public byte     action;
+    private byte     action;
     private String   username;
     private String   content;
 
@@ -16,6 +16,18 @@ public class NotificationMsg extends Message{
         super(MessageCode.NOTIFICATION.OPCODE);
     }
 
+    public void setAction(byte action) { this.action = action; }
+    public void setUsername(String username){this.username=username;}
+    public void setContent(String content) {
+        this.content = content;
+    }
+    public byte getAction() { return action; }
+    public String getUsername() { return username; }
+    public String getContent() {
+        return this.content;
+    }
+
+    @Override
     public void process() throws IOException{
         throw new IOException("Recieved Error msg inside the server");
     }
@@ -24,13 +36,7 @@ public class NotificationMsg extends Message{
     public byte[] serialize() {
         return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username + '\0' + this.content + '\0');
     }
-    public void setUsername(String username){this.username=username;}
-    public void setContent(String content) {
-        this.content = content;
-    }
-    public String getContent() {
-        return this.content;
-    }
+
     @Override
     public void decodeNextByte(byte data) {
         if(this.content_index == 0) {

@@ -19,7 +19,7 @@ public class PostMsg extends Message{
     }
 
     public void process(){
-        User user=db.search(this.connId);
+        User user = db.search(this.connId);
         if(user.getLogged_in()){
         ConnectionsImpl<Message> tempConnections=new ConnectionsImpl();
         NotificationMsg myPost=new NotificationMsg();
@@ -70,22 +70,22 @@ public class PostMsg extends Message{
         }
     }
     private LinkedList<Integer> findShtrudel(String content){
-        User Postuser=db.search(this.connId);
-        LinkedList<Integer> ans=new LinkedList<>();
-        String content1=content;
-        String name="";
-        int firstShtrud=content1.indexOf("@");
-        int temp=firstShtrud;
-        while(temp!=-1){
-            int endname=content1.substring(firstShtrud).indexOf(" ");
-            if(endname==-1){
-                endname=content1.length()-firstShtrud;
+        User Postuser = db.search(this.connId);
+        LinkedList<Integer> ans = new LinkedList<>();
+        String content1 = content;
+        String name = "";
+        int firstShtrud = content1.indexOf("@");
+        int temp = firstShtrud;
+        while(temp != -1){
+            int endname = content1.substring(firstShtrud).indexOf(" ");
+            if(endname == -1){
+                endname = content1.length() - firstShtrud;
             }
-            name=content1.substring(firstShtrud+1,firstShtrud+endname);
-            User user=db.get(name);
-            if(user!=null &&!Postuser.isBlock(name))
+            name = content1.substring(firstShtrud+1, firstShtrud+endname);
+            User user = db.get(name);
+            if(user != null && !Postuser.isBlocked(name))
                 ans.add(user.getConnectionID());
-            temp=content1.substring(firstShtrud+endname).indexOf("@");
+            temp = content1.substring(firstShtrud+endname).indexOf("@");
             firstShtrud=firstShtrud+temp+name.length()+1;
 
         }
@@ -93,28 +93,9 @@ public class PostMsg extends Message{
     }
 
     private String filter(String content){
-        if(content!=null) {
-            String[] filterWords = db.getFilterWords();
-            String s = content;
-            for (int i = 0; i < filterWords.length; i++) {
-                int place = s.indexOf(filterWords[i]);
-                int tempPlace = place;
-                int length = filterWords[i].length();
-                while (tempPlace != -1) {
-                    if (place == 0 || !isLetter(s.charAt(place-1))) {
-                        if (s.length() <= (place + length) || !isLetter(s.charAt(place+length))) {
-                            s = s.substring(0, place) + "<filter>" + s.substring(place + length);
-                            length = 8;
-                        }
-                    }
-                    tempPlace = s.substring(place + length).indexOf(filterWords[i]);
-                    place = place + length + tempPlace;
-                    length = filterWords[i].length();
-
-                }
-            }
-            return s;
+        for(String filteredWord : this.db.getFilterWords()){
+            content = content.replaceAll("\\b" + filteredWord + "\\b", "<filtered>");
         }
-        return "";
+        return content;
     }
 }

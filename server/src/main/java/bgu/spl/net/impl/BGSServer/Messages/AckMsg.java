@@ -10,20 +10,16 @@ import java.util.LinkedList;
 
 public class AckMsg extends Message{
     private short    msgOpCode;
-    private LinkedList<String>optional=new LinkedList<>();
+    private LinkedList<String> optional = new LinkedList<>();
+
     public AckMsg(){
         super(MessageCode.ACK.OPCODE);
     }
-
-    public short getMsgOpCode() {
-        return msgOpCode;
-    }
-
-    public void setMsgOpCode(short msgOpCode) {
-        this.msgOpCode = msgOpCode;
-    }
-
+    public short getMsgOpCode() { return msgOpCode; }
+    public void setMsgOpCode(short msgOpCode) { this.msgOpCode = msgOpCode; }
+    public LinkedList<String> getOptional() { return optional; }
     public void setOptional(LinkedList<String>l){optional=l;}
+
     @Override
     public void process() throws IOException{
         throw new IOException("Recieved Ack msg inside the server");
@@ -31,10 +27,9 @@ public class AckMsg extends Message{
 
     @Override
     public byte[] serialize() {
-        String ans="";
-        ans=ans+shortToString(opcode) + shortToString(this.msgOpCode);
-        for(int i=0;i<optional.size();i++){
-            ans=ans+optional.get(i);
+        String ans = shortToString(opcode) + shortToString(this.msgOpCode);
+        for(int i = 0; i < optional.size(); i++){
+            ans += optional.get(i);
         }
         return this.StringtoByte(ans);
     }

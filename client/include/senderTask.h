@@ -6,10 +6,11 @@
 class senderTask {
     private:
         ConnectionHandler&  connectionHandler;
-        std::mutex&         mutex;
-        int                 _id;
+        int                 _id = -1;
+        bool                terminate = false;
     public:
-        senderTask(ConnectionHandler& connectionHandler, std::mutex& mutex, int _id);
+        senderTask(ConnectionHandler& connectionHandler, int _id);
+        void shouldTerminate();
         void run();
 };
 

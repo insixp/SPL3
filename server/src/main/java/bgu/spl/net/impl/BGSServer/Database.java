@@ -1,23 +1,17 @@
 package bgu.spl.net.impl.BGSServer;
 
-import bgu.spl.net.api.bidi.ConnectionHandler;
 import bgu.spl.net.impl.BGSServer.Messages.NotificationMsg;
-import bgu.spl.net.impl.BGSServer.Messages.PostMsg;
-import bgu.spl.net.impl.BGSServer.Messages.SavedMessegesData;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Database {
 
     ConcurrentHashMap<String, User>  usernameToUserDBHS;
-    SavedMessegesData SavedMesseges;
-    //ReentrantLock FollowList=new ReentrantLock();   ask CHUPA
-    private String[] filterWords={"goku","gohan","mkita"};
+    SavedMessagesData SavedMesseges;
+    private String[] filterWords = {"goku","gohan","mkita"};
 
     private static class singletonHolder{
         private static Database instance = new Database();
@@ -32,7 +26,7 @@ public class Database {
     private Database(){
         this.users = new LinkedList<>();
         this.usernameToUserDBHS = new ConcurrentHashMap<>();
-        this.SavedMesseges=new SavedMessegesData();
+        this.SavedMesseges=new SavedMessagesData();
     }
 
     public void register(String username, String password, String birthday){
@@ -54,8 +48,8 @@ public class Database {
     }
 
     public User search(int connId){
-        List<User>  users = Collections.list(this.usernameToUserDBHS.elements());
-        int counter =0;
+        List<User> users = Collections.list(this.usernameToUserDBHS.elements());
+        int counter = 0;
         for(User user : users){
             counter++;
             if(user.getConnectionID() == connId)

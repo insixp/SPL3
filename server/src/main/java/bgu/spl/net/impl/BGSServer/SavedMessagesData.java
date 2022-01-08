@@ -1,11 +1,13 @@
-package bgu.spl.net.impl.BGSServer.Messages;
+package bgu.spl.net.impl.BGSServer;
+
+import bgu.spl.net.impl.BGSServer.Messages.NotificationMsg;
 import java.util.LinkedList;
 
-public class SavedMessegesData {
+public class SavedMessagesData {
     private LinkedList<NotificationMsg> PM;
     private LinkedList<NotificationMsg> Posts;
 
-    public SavedMessegesData() {
+    public SavedMessagesData() {
         this.PM = new LinkedList<>();
         this.Posts = new LinkedList<>();
     }
