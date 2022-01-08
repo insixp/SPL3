@@ -19,6 +19,7 @@ public class BlockMsg extends Message{
         String blockingName=blockingUser.getUsername();
         if(blockedUser!=null){
             blockedUser.addToBlockedMe(blockingName);
+            blockingUser.addToIBlocked(username);
             blockedUser.removeFollowMe(blockingName);
             blockedUser.removeUsersIFollow(blockingName);
             blockingUser.removeFollowMe(username);

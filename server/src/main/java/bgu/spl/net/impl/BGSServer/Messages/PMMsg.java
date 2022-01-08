@@ -6,6 +6,8 @@ import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
 
+import static java.lang.Character.isLetter;
+
 public class PMMsg extends Message{
 
     public String  username;
@@ -21,16 +23,16 @@ public class PMMsg extends Message{
         User reciveUser=db.get(username);
         if( sendUser!=null && reciveUser!=null && sendUser.getLogged_in() &&
                 sendUser.getUsersIFollowList().contains(username)&&
-                !sendUser.getBlockedMeList().contains(username)){
+                !sendUser.isBlock(username)){
             int reciveID=reciveUser.getConnectionID();
             NotificationMsg noti=new NotificationMsg();
-            noti.setContent(this.filter(content));
+            noti.setContent(filter(content));
             noti.setUsername(sendUser.getUsername());
             AckMsg ackmsg=new AckMsg();
             ackmsg.setMsgOpCode(this.opcode);
             this.connections.send(this.connId,ackmsg);
             this.connections.send(reciveID,noti);
-            this.db.saveMesssege(noti);
+            this.db.savePMMesssege(noti);
         }
         else{
             this.sendError();
@@ -65,17 +67,16 @@ public class PMMsg extends Message{
         }
     }
     private String filter(String content){
-        if(content !=null) {
+        if(content!=null) {
             String[] filterWords = db.getFilterWords();
             String s = content;
             for (int i = 0; i < filterWords.length; i++) {
                 int place = s.indexOf(filterWords[i]);
                 int tempPlace = place;
                 int length = filterWords[i].length();
-
                 while (tempPlace != -1) {
-                    if (place == 0 || s.charAt(place - 1) < 65 || (s.charAt(place - 1) > 90 && s.charAt(place - 1) < 97) || s.charAt(place - 1) > 122) {
-                        if (s.length() <= (place + length) || (s.charAt(place + length) < 65 || (s.charAt(place + length) > 90 && s.charAt(place + length) < 97) || s.charAt(place + length) > 122)) {
+                    if (place == 0 || !isLetter(s.charAt(place-1))) {
+                        if (s.length() <= (place + length) || !isLetter(s.charAt(place+length))) {
                             s = s.substring(0, place) + "<filter>" + s.substring(place + length);
                             length = 8;
                         }

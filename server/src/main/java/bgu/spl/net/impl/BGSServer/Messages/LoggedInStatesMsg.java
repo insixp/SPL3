@@ -17,14 +17,12 @@ public class LoggedInStatesMsg extends Message{
         AckMsg ackMsg = new AckMsg();
         ackMsg.setMsgOpCode(this.opcode);
         LinkedList<String> information = new LinkedList<>();
-        if(user!=null&&user.getLogged_in()){
+        if(user!=null && user.getLogged_in()){
             LinkedList<User> users=db.getUsersList();
             for(int i=0;i<users.size();i++){
                 User tempuser=users.get(i);
-
                 if(tempuser!=null) {
-                    if(tempuser.getLogged_in()) {
-                        if (!user.getBlockedMeList().contains(tempuser.getUsername())) {
+                    if(tempuser.getLogged_in()&&!user.isBlock(tempuser.getUsername())) {
                             if (i > 0) {
                                 information.add("10");
                                 information.add("7");
@@ -34,7 +32,6 @@ public class LoggedInStatesMsg extends Message{
                             information.add("" + tempuser.getNumberofFollowers());
                             information.add("" + tempuser.getNumberofFollowing());
                         }
-                    }
                 }
                 else{
                     this.sendError();

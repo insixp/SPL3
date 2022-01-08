@@ -51,5 +51,4 @@ public class NotificationMsg extends Message{
         }
     }
 
-
 }
