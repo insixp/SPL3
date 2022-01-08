@@ -15,7 +15,7 @@ public class StatsMsg extends Message{
     }
 
     public void process(){
-        User user=db.search(connId);
+        User user = db.search(connId);
         AckMsg ackMsg = new AckMsg();
         ackMsg.setMsgOpCode(this.opcode);
         LinkedList<String> information = new LinkedList<>();
@@ -28,7 +28,7 @@ public class StatsMsg extends Message{
             else{
                 for (int i = 0; i < users.size(); i++) {
                     User tempuser = users.get(i);
-                    if (tempuser != null &&!user.isBlock(tempuser.getUsername())) {
+                    if (tempuser != null &&!user.isBlocked(tempuser.getUsername())) {
                             if (i > 0) {
                                 information.add("10");
                                 information.add("7");

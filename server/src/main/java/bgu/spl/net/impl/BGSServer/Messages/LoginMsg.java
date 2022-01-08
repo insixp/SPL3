@@ -8,18 +8,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Queue;
 
 public class LoginMsg extends Message{
-    public String  username;
-    public String  password;
-    public byte    captcha;
+    private String  username;
+    private String  password;
+    private byte    captcha;
 
     public LoginMsg(){
         super(MessageCode.LOGIN.OPCODE);
     }
 
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public byte getCaptcha() { return captcha; }
+
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+    public void setCaptcha(byte captcha) { this.captcha = captcha; }
 
     public void process(){
         User user = db.get(this.username);
-        if(user == null||this.captcha==0){
+        if(user == null || this.captcha == 0 || user.getLogged_in()){
             this.sendError();
         } else {
             if(!user.getPassword().equals(this.password)){
@@ -54,6 +61,7 @@ public class LoginMsg extends Message{
         }
         else if(this.content_index == 2) {
             this.captcha = data;
+            this.content_index++;
         }
         else {
             this.data.add(data);

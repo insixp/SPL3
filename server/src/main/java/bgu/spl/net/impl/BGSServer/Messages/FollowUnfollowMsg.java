@@ -9,13 +9,19 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FollowUnfollowMsg extends Message{
-    public byte         action;
-    public String       username;
+    private byte         action;
+    private String       username;
 
     public FollowUnfollowMsg(){
         super(MessageCode.FOLLOW.OPCODE);
     }
 
+    public byte getAction() { return action; }
+    public void setAction(byte action) { this.action = action; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    @Override
     public void process(){
         if(action == '\0') {
             processFollow();
@@ -24,17 +30,15 @@ public class FollowUnfollowMsg extends Message{
             processUnfollow();
     }
     private void processFollow(){
-        User MeUser=db.search(this.connId);
-        User FoUser=db.get(username);
-        ConcurrentLinkedQueue<String> folowers=MeUser.getUsersIFollowList();
-        if(FoUser!=null&& MeUser.getLogged_in() && !folowers.contains(this.username)&&
-        !MeUser.isBlock(username)){
+        User MeUser = db.search(this.connId);
+        User FoUser = db.get(username);
+        if(FoUser != null && MeUser!= null && FoUser != MeUser &&  MeUser.getLogged_in() && !MeUser.isFollowing(this.username) && !MeUser.isBlocked(username)){
             MeUser.addToUsersIFollow(username);
             FoUser.addToFollowMe(MeUser.getUsername());
-            AckMsg ackMsg=new AckMsg();
+            AckMsg ackMsg = new AckMsg();
             ackMsg.setMsgOpCode(opcode);
-            LinkedList<String>U=new LinkedList<>();
-            U.add(username);
+            LinkedList<String> U = new LinkedList<>();
+            U.add(username + '\0');
             ackMsg.setOptional(U);
             connections.send(connId,ackMsg);
         }
@@ -45,19 +49,20 @@ public class FollowUnfollowMsg extends Message{
     private void processUnfollow() {
         User MeUser = db.search(this.connId);
         User FoUser = db.get(username);
-        ConcurrentLinkedQueue<String> folowers = MeUser.getUsersIFollowList();
-        if (FoUser != null && MeUser.getLogged_in() && folowers.contains(this.username)) {
+        if (FoUser != null && MeUser != null && FoUser != MeUser && MeUser.getLogged_in() && MeUser.isFollowing(this.username)) {
             MeUser.removeUsersIFollow(username);
             FoUser.removeFollowMe(MeUser.getUsername());
             AckMsg ackMsg = new AckMsg();
+            ackMsg.setMsgOpCode(opcode);
             LinkedList<String>U=new LinkedList<>();
-            U.add(username);
+            U.add(username + '\0');
             ackMsg.setOptional(U);
             connections.send(connId, ackMsg);
         } else {
             this.sendError();
         }
     }
+
     @Override
     public byte[] serialize() {
         return this.StringtoByte(shortToString(opcode) + byteToString(this.action) + this.username);

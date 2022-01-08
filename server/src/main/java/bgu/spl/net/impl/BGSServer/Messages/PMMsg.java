@@ -10,28 +10,36 @@ import static java.lang.Character.isLetter;
 
 public class PMMsg extends Message{
 
-    public String  username;
-    public String  content;
-    public String  info;
+    private String  username;
+    private String  content;
+    private String  info;
+
+    public String getUsername() { return username; }
+    public String getContent() { return content; }
+    public String getInfo() { return info; }
+
+    public void setUsername(String username) { this.username = username; }
+    public void setContent(String content) { this.content = content; }
+    public void setInfo(String info) { this.info = info; }
 
     public PMMsg(){
         super(MessageCode.PM.OPCODE);
     }
 
     public void process(){
-        User sendUser=db.search(this.connId);
-        User reciveUser=db.get(username);
-        if( sendUser!=null && reciveUser!=null && sendUser.getLogged_in() &&
-                sendUser.getUsersIFollowList().contains(username)&&
-                !sendUser.isBlock(username)){
-            int reciveID=reciveUser.getConnectionID();
-            NotificationMsg noti=new NotificationMsg();
+        User sendUser = db.search(this.connId);
+        User receiveUser = db.get(username);
+        if(sendUser != null && receiveUser != null && sendUser != receiveUser && sendUser.getLogged_in() &&
+                sendUser.isFollowing(this.username) &&
+                !sendUser.isBlocked(username)){
+            int receiveID = receiveUser.getConnectionID();
+            NotificationMsg noti = new NotificationMsg();
             noti.setContent(filter(content));
             noti.setUsername(sendUser.getUsername());
-            AckMsg ackmsg=new AckMsg();
+            AckMsg ackmsg = new AckMsg();
             ackmsg.setMsgOpCode(this.opcode);
             this.connections.send(this.connId,ackmsg);
-            this.connections.send(reciveID,noti);
+            this.connections.send(receiveID,noti);
             this.db.savePMMesssege(noti);
         }
         else{

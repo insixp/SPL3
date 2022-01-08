@@ -7,17 +7,18 @@
 #include <iostream>
 #include <ctime>
 
-senderTask::senderTask(ConnectionHandler& connectionHandler, std::mutex& mutex, int _id): 
-connectionHandler(connectionHandler),
-mutex(mutex),
-_id(_id){}
+senderTask::senderTask(ConnectionHandler& connectionHandler, int _id): 
+connectionHandler(connectionHandler){
+    this-> terminate = false;
+    this->_id = _id;
+}
 
 void senderTask::run(){
     std::vector<std::string> command(0);
 
     std::string line;
 
-    while(1){
+    while(!this->terminate){
 
         command.clear();
         getline(std::cin, line);
@@ -65,7 +66,12 @@ void senderTask::run(){
                 std::cout << "Follow command must have 2 arguments and argument 1 must be 0/1" << std::endl;
                 continue;
             }
-            message = command[1] + command[2] + '\x00';
+            char follow_unfollow;
+            if(command[1].compare("0") == 0)
+                follow_unfollow = '\0';
+            else
+                follow_unfollow = '\1';
+            message = follow_unfollow + command[2] + '\x00';
             opcode = OP_CODES::FOLLOW;
         }
         else if(command[0].compare("POST") == 0){
@@ -73,8 +79,9 @@ void senderTask::run(){
                 std::cout << "POST command must have atleast 1 argument" << std::endl;
                 continue;
             }
-            for(size_t i = 1; i < command.size(); i++)
-                message += command[i];
+            message += command[1];
+            for(size_t i = 2; i < command.size(); i++)
+                message +=  " " + command[i];
             message += '\x00';
             opcode = OP_CODES::POST;
         }
@@ -89,8 +96,9 @@ void senderTask::run(){
             std::strftime(buff, 64, "%d-%m-%Y %H:%M", info);
             std::string time = std::string(buff);
             message = command[1] + '\x00';
-            for(size_t i = 2; i < command.size(); i++)
-                message += command[i];
+            message += command[2];
+            for(size_t i = 3; i < command.size(); i++)
+                message +=  " " + command[i];
             message += '\x00' + time + '\x00';
             opcode = OP_CODES::PM;
         }
@@ -103,11 +111,15 @@ void senderTask::run(){
             opcode = OP_CODES::LOGGED_IN_STATS;
         }
         else if(command[0].compare("STAT") == 0){
-            if(command.size() != 2){
+            if(command.size() < 2){
                 std::cout << "STAT command must have 1 arguments" << std::endl;
                 continue;
             }
-            message = command[1] + '\x00';
+            std::string usernames;
+            usernames += command[1];
+            for(size_t i = 2; i < command.size(); i++)
+                usernames +=  "|" + command[i];
+            message = usernames + '\x00';
             opcode = OP_CODES::STATS;
         }
         else if(command[0].compare("BLOCK") == 0){
@@ -129,4 +141,8 @@ void senderTask::run(){
             break;
         }
     }
+}
+
+void senderTask::shouldTerminate(){
+    this->terminate = true;
 }

@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class ErrorMsg extends Message{
     private short    msgOpCode;
-
     private byte[] buff;
 
     public ErrorMsg(){
@@ -15,9 +14,9 @@ public class ErrorMsg extends Message{
     }
 
     public void setOpCode(short msgOpCode) { this.msgOpCode = msgOpCode; }
-
     public short getMsgOpCode() { return msgOpCode; }
 
+    @Override
     public void process() throws IOException{
         throw new IOException("Recieved Error msg inside the server");
     }
@@ -42,6 +41,4 @@ public class ErrorMsg extends Message{
             this.data.add(data);
         }
     }
-
-
 }
