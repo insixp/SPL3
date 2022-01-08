@@ -69,23 +69,29 @@ void senderTask::run(){
             opcode = OP_CODES::FOLLOW;
         }
         else if(command[0].compare("POST") == 0){
-            if(command.size() != 2){
-                std::cout << "POST command must have 1 arguments" << std::endl;
+            if(command.size() < 1){
+                std::cout << "POST command must have atleast 1 argument" << std::endl;
                 continue;
             }
-            message = command[1] + '\x00';
+            for(size_t i = 1; i < command.size(); i++)
+                message += command[i];
+            message += '\x00';
             opcode = OP_CODES::POST;
         }
         else if(command[0].compare("PM") == 0){
-            if(command.size() != 3){
-                std::cout << "PM command must have 2 arguments" << std::endl;
+            if(command.size() < 2){
+                std::cout << "PM command must have atleast 2 arguments" << std::endl;
                 continue;
             }
             std::time_t now = std::time(nullptr);
             std::tm* info = std::localtime(&now);
             char buff[64];
             std::strftime(buff, 64, "%d-%m-%Y %H:%M", info);
-            message = command[1] + '\x00' + command[2] + '\x00' + buff + '\x00';
+            std::string time = std::string(buff);
+            message = command[1] + '\x00';
+            for(size_t i = 2; i < command.size(); i++)
+                message += command[i];
+            message += '\x00' + time + '\x00';
             opcode = OP_CODES::PM;
         }
         else if(command[0].compare("LOGSTAT") == 0){

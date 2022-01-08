@@ -35,7 +35,12 @@ int main (int argc, char *argv[]) {
             if(opcode == ACK){
                 connectionHandler.getShort(short_bytes);
                 OP_CODES preMsgOpCode = (OP_CODES)bytesToShort(short_bytes);
-                std::cout << "Message(" + std::to_string(preMsgOpCode) + ") recieved" << std::endl;
+                std::string ACK_print = "ACK " + std::to_string(preMsgOpCode);
+                if(preMsgOpCode == LOGGED_IN_STATS || preMsgOpCode == STATS){
+                    connectionHandler.getRestOfMessage(message, ';');
+                    ACK_print += message.substr(0, message.size()-2);
+                }
+                std::cout << ACK_print << std::endl;
                 connectionHandler.getRestOfMessage(message, ';');
             }
             else if(opcode == ERROR){
@@ -56,7 +61,7 @@ int main (int argc, char *argv[]) {
                     notiType = "Public";
                 connectionHandler.getString(username);
                 connectionHandler.getRestOfMessage(content, ';');
-                std::cout << "NOTIFICATION " << notiType << " " << username << " " << content << std::endl;
+                std::cout << "NOTIFICATION " << notiType << " " << username << " " << content.substr(0, content.size()-2) << std::endl;
             } else {
                 std::cerr << "Recieved unrecognized message type" << std::endl;
                 continue;

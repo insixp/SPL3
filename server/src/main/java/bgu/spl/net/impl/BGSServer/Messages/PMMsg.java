@@ -50,12 +50,12 @@ public class PMMsg extends Message{
             if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 2) {
+        else if(this.content_index == 1) {
             this.content = this.bytesToString(data);
             if(data == '\0')
                 this.content_index++;
         }
-        else if(this.content_index == 4) {
+        else if(this.content_index == 2) {
             this.info = this.bytesToString(data);
             if(data == '\0')
                 this.content_index++;

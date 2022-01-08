@@ -1,13 +1,14 @@
 package bgu.spl.net.impl.BGSServer;
 
-import bgu.spl.net.api.bidi.Connections;
-import bgu.spl.net.impl.BGSServer.Messages.Message;
 import bgu.spl.net.impl.BGSServer.Messages.PostMsg;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -95,17 +96,10 @@ public class User {
         return birthday;
     }
 
-    public String getAge(){
-        String birthYear=this.birthday.substring(6);
-        int year=0;
-        int temp=1;
-        int Age;
-        for(int i=0;i<4;i++){
-            year=year+(birthYear.charAt(3-i)-48)*temp;
-            temp=temp*10;
-        }
-        Age=2021-year;
-        return ""+Age;
+    public int getAge(){
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate birthday = LocalDate.parse(this.birthday, format);
+        return Period.between(birthday , LocalDate.now()).getYears();
     }
 
     public int getNumOfPosts() {

@@ -16,7 +16,7 @@ public class FollowUnfollowMsg extends Message{
     }
 
     public void process(){
-        if(action==48) {
+        if(action == '\0') {
             processFollow();
         }
         else

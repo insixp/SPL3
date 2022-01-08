@@ -33,7 +33,7 @@ public class StatsMsg extends Message{
                                 information.add("10");
                                 information.add("7");
                             }
-                            information.add(tempuser.getAge());
+                            information.add(String.valueOf(tempuser.getAge()));
                             information.add("" + tempuser.getNumOfPosts());
                             information.add("" + tempuser.getNumberofFollowers());
                             information.add("" + tempuser.getNumberofFollowing());
