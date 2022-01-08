@@ -66,10 +66,10 @@ public class Database {
         return null;
     }
     public String[] getFilterWords(){return this.filterWords;}
-    public void saveMesssege(NotificationMsg noti){
+    public void savePMMesssege(NotificationMsg noti){
         this.SavedMesseges.insertPM(noti);
     }
-    public void saveMessege(PostMsg post){
+    public void savePostMessege(NotificationMsg post){
         this.SavedMesseges.insertPost(post);
     }
     public LinkedList<User> getUsersList(){

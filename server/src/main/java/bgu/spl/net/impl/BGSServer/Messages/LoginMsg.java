@@ -60,7 +60,7 @@ public class LoginMsg extends Message{
         }
     }
     private void sendBackup(User user){
-        Queue<PostMsg> q=user.getBackupMesseges();
+        Queue<NotificationMsg> q=user.getBackupMesseges();
         while(!q.isEmpty()&&user.getLogged_in()){
             this.connections.send(this.connId,q.poll());
         }

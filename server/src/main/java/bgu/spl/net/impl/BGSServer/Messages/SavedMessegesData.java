@@ -3,7 +3,7 @@ import java.util.LinkedList;
 
 public class SavedMessegesData {
     private LinkedList<NotificationMsg> PM;
-    private LinkedList<PostMsg> Posts;
+    private LinkedList<NotificationMsg> Posts;
 
     public SavedMessegesData() {
         this.PM = new LinkedList<>();
@@ -14,7 +14,7 @@ public class SavedMessegesData {
         this.PM.add(noti);
     }
 
-    public void insertPost(PostMsg post) {
+    public void insertPost(NotificationMsg post) {
         this.Posts.add(post);
     }
 }

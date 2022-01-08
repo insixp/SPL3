@@ -7,6 +7,9 @@ import bgu.spl.net.srv.ConnectionsImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static java.lang.Character.isLetter;
 
 public class PostMsg extends Message{
     public String  content;
@@ -15,30 +18,25 @@ public class PostMsg extends Message{
         super(MessageCode.POST.OPCODE);
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-    public String getContent(){
-        return this.content;
-    }
-
     public void process(){
         User user=db.search(this.connId);
         if(user.getLogged_in()){
         ConnectionsImpl<Message> tempConnections=new ConnectionsImpl();
-        PostMsg myPost=new PostMsg();
+        NotificationMsg myPost=new NotificationMsg();
         myPost.setContent(filter(content));
-        LinkedList<String> followMe=user.getFollowMeList();
+        myPost.setUsername(user.getUsername());
+        ConcurrentLinkedQueue<String> followMe=user.getFollowMeList();
         LinkedList<Integer> ShtrudelUsers=findShtrudel(content);
-        for(int i=0;i<followMe.size();i++){//all the users that follow me
-            User follower=db.get(followMe.get(i));
-            if(follower.getLogged_in()){
-                tempConnections.register(((ConnectionsImpl)connections).getConnectionHandler(follower.getConnectionID()));
+        //for(int i=0;i<followMe.size();i++){//all the users that follow me
+            while(!followMe.isEmpty()){
+                User follower = db.get(followMe.poll());
+                if (follower.getLogged_in()) {
+                    tempConnections.register(((ConnectionsImpl) connections).getConnectionHandler(follower.getConnectionID()));
+                } else {//if the user is logout
+                    follower.pushBackup(myPost);
+                }
             }
-            else{//if the user is logout
-                follower.pushBackup(myPost);
-            }
-        }
+        //}
         for(int j=0;j<ShtrudelUsers.size();j++){//all the @users
             tempConnections.register(((ConnectionsImpl)connections).getConnectionHandler(ShtrudelUsers.get(j)));
         }
@@ -47,7 +45,7 @@ public class PostMsg extends Message{
         this.connections.send(this.connId,ackmsg);
         tempConnections.broadcast(myPost);
         user.updatePosts();
-        this.db.saveMessege(myPost);
+        this.db.savePostMessege(myPost);
 
     }
         else{
@@ -72,6 +70,7 @@ public class PostMsg extends Message{
         }
     }
     private LinkedList<Integer> findShtrudel(String content){
+        User Postuser=db.search(this.connId);
         LinkedList<Integer> ans=new LinkedList<>();
         String content1=content;
         String name="";
@@ -84,7 +83,7 @@ public class PostMsg extends Message{
             }
             name=content1.substring(firstShtrud+1,firstShtrud+endname);
             User user=db.get(name);
-            if(user!=null)
+            if(user!=null &&!Postuser.isBlock(name))
                 ans.add(user.getConnectionID());
             temp=content1.substring(firstShtrud+endname).indexOf("@");
             firstShtrud=firstShtrud+temp+name.length()+1;
@@ -92,6 +91,7 @@ public class PostMsg extends Message{
         }
         return ans;
     }
+
     private String filter(String content){
         if(content!=null) {
             String[] filterWords = db.getFilterWords();
@@ -100,10 +100,9 @@ public class PostMsg extends Message{
                 int place = s.indexOf(filterWords[i]);
                 int tempPlace = place;
                 int length = filterWords[i].length();
-
                 while (tempPlace != -1) {
-                    if (place == 0 || s.charAt(place - 1) < 65 || (s.charAt(place - 1) > 90 && s.charAt(place - 1) < 97) || s.charAt(place - 1) > 122) {
-                        if (s.length() <= (place + length) || (s.charAt(place + length) < 65 || (s.charAt(place + length) > 90 && s.charAt(place + length) < 97) || s.charAt(place + length) > 122)) {
+                    if (place == 0 || !isLetter(s.charAt(place-1))) {
+                        if (s.length() <= (place + length) || !isLetter(s.charAt(place+length))) {
                             s = s.substring(0, place) + "<filter>" + s.substring(place + length);
                             length = 8;
                         }
@@ -118,5 +117,4 @@ public class PostMsg extends Message{
         }
         return "";
     }
-
 }

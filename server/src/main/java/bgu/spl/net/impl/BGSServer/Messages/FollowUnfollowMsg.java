@@ -6,6 +6,7 @@ import bgu.spl.net.impl.BGSServer.User;
 
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FollowUnfollowMsg extends Message{
     public byte         action;
@@ -25,9 +26,9 @@ public class FollowUnfollowMsg extends Message{
     private void processFollow(){
         User MeUser=db.search(this.connId);
         User FoUser=db.get(username);
-        LinkedList<String> folowers=MeUser.getUsersIFollowList();
+        ConcurrentLinkedQueue<String> folowers=MeUser.getUsersIFollowList();
         if(FoUser!=null&& MeUser.getLogged_in() && !folowers.contains(this.username)&&
-        !MeUser.getBlockedMeList().contains(username)){
+        !MeUser.isBlock(username)){
             MeUser.addToUsersIFollow(username);
             FoUser.addToFollowMe(MeUser.getUsername());
             AckMsg ackMsg=new AckMsg();
@@ -44,7 +45,7 @@ public class FollowUnfollowMsg extends Message{
     private void processUnfollow() {
         User MeUser = db.search(this.connId);
         User FoUser = db.get(username);
-        LinkedList<String> folowers = MeUser.getUsersIFollowList();
+        ConcurrentLinkedQueue<String> folowers = MeUser.getUsersIFollowList();
         if (FoUser != null && MeUser.getLogged_in() && folowers.contains(this.username)) {
             MeUser.removeUsersIFollow(username);
             FoUser.removeFollowMe(MeUser.getUsername());
