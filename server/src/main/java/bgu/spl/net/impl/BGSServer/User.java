@@ -4,6 +4,7 @@ import bgu.spl.net.impl.BGSServer.Messages.NotificationMsg;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class User {
@@ -15,22 +16,20 @@ public class User {
     private int numOfPosts;
     private ConcurrentLinkedQueue<String> UsersIFollowList;
     private ConcurrentLinkedQueue<String> FollowMeList;
-    private ConcurrentLinkedQueue<String>BlockedMeList;
-    private ConcurrentLinkedQueue<String>IBlockedList;
+    private ConcurrentLinkedQueue<String> blockedList;
     private ConcurrentLinkedQueue<NotificationMsg>backupMesseges;
 
     public User(){
-        this.UsersIFollowList=new ConcurrentLinkedQueue<>();
-        this.FollowMeList=new ConcurrentLinkedQueue<>();
-        this.BlockedMeList=new ConcurrentLinkedQueue<>();
-        this.IBlockedList=new ConcurrentLinkedQueue<>();
-        this.backupMesseges=new ConcurrentLinkedQueue<>();
+        this.UsersIFollowList = new ConcurrentLinkedQueue<>();
+        this.FollowMeList = new ConcurrentLinkedQueue<>();
+        this.blockedList = new ConcurrentLinkedQueue<>();
+        this.backupMesseges = new ConcurrentLinkedQueue<>();
         this.numOfPosts=0;
     }
 
 
     //  Follow
-    public ConcurrentLinkedQueue<String> getFollowMeList(){ return new ConcurrentLinkedQueue(FollowMeList); }
+    public LinkedList<String> getFollowMeList(){ return new LinkedList<String>(FollowMeList); }
     public void addToFollowMe(String username){this.FollowMeList.add(username);}
     public void removeFollowMe(String username){this.FollowMeList.remove(username);}
     public void addToUsersIFollow(String username){this.UsersIFollowList.add(username);}
@@ -38,14 +37,11 @@ public class User {
     public boolean isFollowing(String username){ return UsersIFollowList.contains(username); }
 
     //  Block
-    public void addToBlockedMe(String username){this.BlockedMeList.add(username);}
-    public void addToIBlocked(String username){this.IBlockedList.add(username);}
-    public boolean isBlocked(String username){ return this.IBlockedList.contains(username); }
+    public void addToBlocked(String username){ this.blockedList.add(username); }
+    public boolean isBlocked(String username){ return this.blockedList.contains(username); }
 
     //  Backup
-    public ConcurrentLinkedQueue<NotificationMsg> getBackupMesseges() {
-        return backupMesseges;
-    }
+    public ConcurrentLinkedQueue<NotificationMsg> getBackupMesseges() { return backupMesseges; }
     public void pushBackup(NotificationMsg post){this.backupMesseges.add(post);}
 
     //  Posts
@@ -59,16 +55,16 @@ public class User {
     public String getUsername() {
         return username;
     }
-    public int getAge(){
+    public short getAge(){
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate birthday = LocalDate.parse(this.birthday, format);
-        return Period.between(birthday , LocalDate.now()).getYears();
+        return (short)(Period.between(birthday , LocalDate.now()).getYears());
     }
-    public int getNumOfPosts() {
-        return numOfPosts;
+    public short getNumOfPosts() {
+        return (short)numOfPosts;
     }
-    public int getNumberofFollowers(){return this.FollowMeList.size();}
-    public int getNumberofFollowing(){return this.UsersIFollowList.size();}
+    public short getNumberofFollowers(){return (short)this.FollowMeList.size();}
+    public short getNumberofFollowing(){return (short)this.UsersIFollowList.size();}
     public int getConnectionID() {return connectionID;}
     public boolean getLogged_in() {return this.logged_in;}
 

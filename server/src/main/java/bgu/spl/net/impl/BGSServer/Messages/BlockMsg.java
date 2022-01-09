@@ -22,8 +22,8 @@ public class BlockMsg extends Message{
         User blockingUser = db.search(connId);
         if(blockedUser != null && blockingUser != null && blockedUser != blockingUser && !blockingUser.isBlocked(this.username)){
             String blockingName = blockingUser.getUsername();
-            blockedUser.addToBlockedMe(blockingName);
-            blockingUser.addToIBlocked(username);
+            blockedUser.addToBlocked(blockingName);
+            blockingUser.addToBlocked(username);
             blockedUser.removeFollowMe(blockingName);
             blockedUser.removeUsersIFollow(blockingName);
             blockingUser.removeFollowMe(username);

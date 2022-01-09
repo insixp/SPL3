@@ -6,8 +6,13 @@ import bgu.spl.net.impl.BGSServer.User;
 import bgu.spl.net.srv.ConnectionsImpl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Character.isLetter;
 
@@ -16,34 +21,35 @@ public class PostMsg extends Message{
 
     public PostMsg(){
         super(MessageCode.POST.OPCODE);
+        this.content = "";
     }
 
     public void process(){
         User user = db.search(this.connId);
-        if(user.getLogged_in()){
-        NotificationMsg myPost=new NotificationMsg();
-        myPost.setContent(filter(content));
-        myPost.setUsername(user.getUsername());
-        ConcurrentLinkedQueue<String> followMe=user.getFollowMeList();
-        LinkedList<Integer> ShtrudelUsers=findShtrudel(content);
-            while(!followMe.isEmpty()){
-                User follower = db.get(followMe.poll());
-                if (follower.getLogged_in()) {
-                    this.connections.send(follower.getConnectionID(),myPost);
-                } else {//if the user is logout
-                    follower.pushBackup(myPost);
+        if(user != null && user.getLogged_in()){
+            NotificationMsg myPost = new NotificationMsg();
+            myPost.setAction((byte)1);
+            myPost.setContent(filter(content));
+            myPost.setUsername(user.getUsername());
+            HashSet<String> toBeSent = new HashSet<String>();
+            toBeSent.addAll(new HashSet<String>(user.getFollowMeList()));
+            toBeSent.addAll(findAtUsers(content));
+            for(String username : toBeSent){
+                User receiver = db.get(username);
+                if(receiver != null && !receiver.isBlocked(user.getUsername())) {
+                    if (receiver.getLogged_in()) {
+                        this.connections.send(receiver.getConnectionID(), myPost);
+                    } else {
+                        receiver.pushBackup(myPost);
+                    }
                 }
             }
-        for(int j=0;j<ShtrudelUsers.size();j++){//all the @users
-            this.connections.send(ShtrudelUsers.get(j),myPost);
-        }
-        AckMsg ackmsg=new AckMsg();
-        ackmsg.setMsgOpCode(this.opcode);
-        this.connections.send(this.connId,ackmsg);
-        user.updatePosts();
-        this.db.savePostMessege(myPost);
-    }
-        else{
+            AckMsg ackmsg=new AckMsg();
+            ackmsg.setMsgOpCode(this.opcode);
+            this.connections.send(this.connId,ackmsg);
+            user.updatePosts();
+            this.db.savePostMessege(myPost);
+        }  else {
             this.sendError();
         }
     }
@@ -64,27 +70,14 @@ public class PostMsg extends Message{
             this.data.add(data);
         }
     }
-    private LinkedList<Integer> findShtrudel(String content){
-        User Postuser = db.search(this.connId);
-        LinkedList<Integer> ans = new LinkedList<>();
-        String content1 = content;
-        String name = "";
-        int firstShtrud = content1.indexOf("@");
-        int temp = firstShtrud;
-        while(temp != -1){
-            int endname = content1.substring(firstShtrud).indexOf(" ");
-            if(endname == -1){
-                endname = content1.length() - firstShtrud;
-            }
-            name = content1.substring(firstShtrud+1, firstShtrud+endname);
-            User user = db.get(name);
-            if(user != null && !Postuser.isBlocked(name))
-                ans.add(user.getConnectionID());
-            temp = content1.substring(firstShtrud+endname).indexOf("@");
-            firstShtrud=firstShtrud+temp+name.length()+1;
-
+    private HashSet<String> findAtUsers(String content){
+        HashSet<String> usernames = new HashSet<>();
+        Pattern pattern = Pattern.compile("(\\W|^)(@)(\\w*)");
+        Matcher matcher = pattern.matcher(content);
+        while(matcher.find()){
+            usernames.add(matcher.group(3));
         }
-        return ans;
+        return usernames;
     }
 
     private String filter(String content){

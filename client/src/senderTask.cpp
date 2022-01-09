@@ -75,7 +75,7 @@ void senderTask::run(){
             opcode = OP_CODES::FOLLOW;
         }
         else if(command[0].compare("POST") == 0){
-            if(command.size() < 1){
+            if(command.size() < 2){
                 std::cout << "POST command must have atleast 1 argument" << std::endl;
                 continue;
             }
@@ -86,7 +86,7 @@ void senderTask::run(){
             opcode = OP_CODES::POST;
         }
         else if(command[0].compare("PM") == 0){
-            if(command.size() < 2){
+            if(command.size() < 3){
                 std::cout << "PM command must have atleast 2 arguments" << std::endl;
                 continue;
             }

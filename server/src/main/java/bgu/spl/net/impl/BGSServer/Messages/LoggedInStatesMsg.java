@@ -20,18 +20,18 @@ public class LoggedInStatesMsg extends Message{
         LinkedList<String> information = new LinkedList<>();
         if(user != null && user.getLogged_in()){
             LinkedList<User> users = db.getUsersList();
-            for(int i=0;i<users.size();i++){
-                User tempuser = users.get(i);
-                if(tempuser != null) {
-                    if(tempuser.getLogged_in() && !user.isBlocked(tempuser.getUsername())) {
-                            if (i > 0) {
-                                information.add("10");
-                                information.add("7");
+            for(int i = 0; i < users.size();i++){
+                User currUser = users.get(i);
+                if(currUser != null) {
+                    if(currUser.getLogged_in() && !user.isBlocked(currUser.getUsername())) {
+                            if (!information.isEmpty()) {
+                                information.add(shortToString(MessageCode.ACK.OPCODE));
+                                information.add(shortToString(MessageCode.LOGGED_IN_STATS.OPCODE));
                             }
-                            information.add(String.valueOf(tempuser.getAge()));
-                            information.add("" + tempuser.getNumOfPosts());
-                            information.add("" + tempuser.getNumberofFollowers());
-                            information.add("" + tempuser.getNumberofFollowing());
+                            information.add(shortToString(currUser.getAge()));
+                            information.add(shortToString(currUser.getNumOfPosts()));
+                            information.add(shortToString(currUser.getNumberofFollowers()));
+                            information.add(shortToString(currUser.getNumberofFollowing()));
                         }
                 }
                 else{

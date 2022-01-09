@@ -34,13 +34,16 @@ public class PMMsg extends Message{
                 !sendUser.isBlocked(username)){
             int receiveID = receiveUser.getConnectionID();
             NotificationMsg noti = new NotificationMsg();
-            noti.setContent(filter(content));
+            noti.setAction((byte)0);
+            noti.setContent(filter(content) + " " + this.info);
             noti.setUsername(sendUser.getUsername());
             AckMsg ackmsg = new AckMsg();
             ackmsg.setMsgOpCode(this.opcode);
             this.connections.send(this.connId,ackmsg);
-            this.connections.send(receiveID,noti);
-            this.db.savePMMesssege(noti);
+            if(receiveUser.getLogged_in())
+                this.connections.send(receiveID,noti);
+            else
+                this.db.savePMMesssege(noti);
         }
         else{
             this.sendError();

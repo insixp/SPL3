@@ -49,13 +49,9 @@ public class Database {
 
     public User search(int connId){
         List<User> users = Collections.list(this.usernameToUserDBHS.elements());
-        int counter = 0;
         for(User user : users){
-            counter++;
             if(user.getConnectionID() == connId)
                 return user;
-            if(counter>3)
-                return null;
         }
         return null;
     }

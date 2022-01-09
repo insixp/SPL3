@@ -19,34 +19,31 @@ public class StatsMsg extends Message{
         AckMsg ackMsg = new AckMsg();
         ackMsg.setMsgOpCode(this.opcode);
         LinkedList<String> information = new LinkedList<>();
-        boolean eror=false;
-        if(user!=null&&user.getLogged_in()) {
-            LinkedList<User> users = StringToListofUsers(usernames);
+        if(user !=null && user.getLogged_in()) {
+            String[] users = StringToListofUsers(usernames);
             if (users == null) {
                 this.sendError();
             }
             else{
-                for (int i = 0; i < users.size(); i++) {
-                    User tempuser = users.get(i);
-                    if (tempuser != null &&!user.isBlocked(tempuser.getUsername())) {
-                            if (i > 0) {
-                                information.add("10");
-                                information.add("7");
-                            }
-                            information.add(String.valueOf(tempuser.getAge()));
-                            information.add("" + tempuser.getNumOfPosts());
-                            information.add("" + tempuser.getNumberofFollowers());
-                            information.add("" + tempuser.getNumberofFollowing());
+                for (int i = 0; i < users.length; i++) {
+                    User currUser = db.get(users[i]);
+                    if (currUser != null && !user.isBlocked(currUser.getUsername())) {
+                        if (!information.isEmpty()) {
+                            information.add(shortToString(MessageCode.ACK.OPCODE));
+                            information.add(shortToString(MessageCode.STATS.OPCODE));
+                        }
+                        information.add(shortToString(currUser.getAge()));
+                        information.add(shortToString(currUser.getNumOfPosts()));
+                        information.add(shortToString(currUser.getNumberofFollowers()));
+                        information.add(shortToString(currUser.getNumberofFollowing()));
 
                     } else {
                         this.sendError();
-                        eror=true;
+                        return;
                     }
                 }
-                if(!eror) {
-                    ackMsg.setOptional(information);
-                    this.connections.send(this.connId, ackMsg);
-                }
+                ackMsg.setOptional(information);
+                this.connections.send(this.connId, ackMsg);
             }
 
         }
@@ -56,23 +53,8 @@ public class StatsMsg extends Message{
     }
 
 
-    public LinkedList<User> StringToListofUsers(String names){
-        LinkedList<User> ans=new LinkedList<>();
-        String usernames=names;
-        if (names.charAt(names.length()-1)!='|')
-            usernames=usernames+"|";
-        int nextBarack=0;
-        nextBarack=usernames.indexOf("|");
-        while(nextBarack!=-1){
-            String name=usernames.substring(0,nextBarack);
-            User user=db.get(name);
-            if(user==null)
-                return null;
-            ans.add(user);
-            usernames=usernames.substring(nextBarack+1);
-            nextBarack=usernames.indexOf("|");
-        }
-        return ans;
+    public String[] StringToListofUsers(String names){
+        return names.split("\\|");
     }
 
     @Override

@@ -22,15 +22,10 @@ public:
     void connect();
  
     void getBytes(char bytes[], unsigned int bytesToRead);
- 
     void sendBytes(const char bytes[], int bytesToWrite);
- 
     void getString(std::string& frame);
-
     void getShort(char bytes[]);
-
     void getRestOfMessage(std::string& frame, char delimiter);
- 
     void SendMessageASCII(const OP_CODES& opcode, const std::string& frame, char delimiter);
 	
     void close();

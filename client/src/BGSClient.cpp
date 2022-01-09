@@ -41,17 +41,48 @@ int main (int argc, char *argv[]) {
                     std::string dump;
                     connectionHandler.getString(username);
                     ACK_print += username;
+                    connectionHandler.getRestOfMessage(message, ';');
                 }
                 else if(preMsgOpCode == LOGGED_IN_STATS || preMsgOpCode == STATS){
-                    connectionHandler.getRestOfMessage(message, ';');
-                    ACK_print += message.substr(0, message.size()-2);
+                    std::string d;
+                    int index = 0;
+                    size_t DATASIZE = 12;
+                    short age;
+                    short posts;
+                    short followers;
+                    short following;
+                    connectionHandler.getRestOfMessage(d, ';');
+                    char data[d.length()+4];
+                    data[0] = '\x00';
+                    data[1] = '\x10';
+                    data[2] = '\x00';
+                    data[3] = '\x07';
+                    d.copy(&data[4], d.length());
+                    while(data[index*DATASIZE] != ';'){
+                        size_t pos = index*DATASIZE;
+                        opcode = (OP_CODES)bytesToShort(&data[pos]);
+                        preMsgOpCode = (OP_CODES)bytesToShort(&data[pos+2]);
+                        age = bytesToShort(&data[pos+4]);
+                        posts = bytesToShort(&data[pos+6]);
+                        followers = bytesToShort(&data[pos+8]);
+                        following = bytesToShort(&data[pos+10]);
+                        if(index != 0){
+                            ACK_print += "\n";
+                            ACK_print +=  std::to_string(opcode) + " " + std::to_string(preMsgOpCode) + " ";
+                        }
+                        ACK_print +=  std::to_string(age) + " " + std::to_string(posts) + " " +
+                                    std::to_string(followers) + " " + std::to_string(following);
+                        index++;
+                    }
                 }
                 else if(preMsgOpCode == LOGOUT) {
                     terminate = true;
-                    senderTask_.shouldTerminate();
+                    pthread_cancel(senderThread_.native_handle());
+                    connectionHandler.getRestOfMessage(message, ';');
+                } else {
+                    connectionHandler.getRestOfMessage(message, ';');
                 }
                 std::cout << ACK_print << std::endl;
-                connectionHandler.getRestOfMessage(message, ';');
             }
             else if(opcode == ERROR){
                 connectionHandler.getShort(short_bytes);
