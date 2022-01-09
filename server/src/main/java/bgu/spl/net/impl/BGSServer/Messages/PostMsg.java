@@ -21,32 +21,27 @@ public class PostMsg extends Message{
     public void process(){
         User user=db.search(this.connId);
         if(user.getLogged_in()){
-        ConnectionsImpl<Message> tempConnections=new ConnectionsImpl();
         NotificationMsg myPost=new NotificationMsg();
         myPost.setContent(filter(content));
         myPost.setUsername(user.getUsername());
         ConcurrentLinkedQueue<String> followMe=user.getFollowMeList();
         LinkedList<Integer> ShtrudelUsers=findShtrudel(content);
-        //for(int i=0;i<followMe.size();i++){//all the users that follow me
             while(!followMe.isEmpty()){
                 User follower = db.get(followMe.poll());
                 if (follower.getLogged_in()) {
-                    tempConnections.register(((ConnectionsImpl) connections).getConnectionHandler(follower.getConnectionID()));
+                    this.connections.send(follower.getConnectionID(),myPost);
                 } else {//if the user is logout
                     follower.pushBackup(myPost);
                 }
             }
-        //}
         for(int j=0;j<ShtrudelUsers.size();j++){//all the @users
-            tempConnections.register(((ConnectionsImpl)connections).getConnectionHandler(ShtrudelUsers.get(j)));
+            this.connections.send(ShtrudelUsers.get(j),myPost);
         }
         AckMsg ackmsg=new AckMsg();
         ackmsg.setMsgOpCode(this.opcode);
         this.connections.send(this.connId,ackmsg);
-        tempConnections.broadcast(myPost);
         user.updatePosts();
         this.db.savePostMessege(myPost);
-
     }
         else{
             this.sendError();
